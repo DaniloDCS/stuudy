@@ -1,0 +1,30 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="/public/css/all.css")
+    script(async, src="/public/js/all.js") 
+    title Stuudy | #{title}
+    style. 
+      .links {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin: 10px;
+      }
+
+      .links a {
+        margin: 10px;
+      }
+
+  body 
+    .links
+      a(href="/courses") Cursos |
+      a(href="/friends") Friends |
+      a(href="/dashboard") Dashboard |
+      a(href="/admin") Administration |
+      a(href="/support") Suporte |
+      a(href="/authenticate/signout") Sair 
+    block content

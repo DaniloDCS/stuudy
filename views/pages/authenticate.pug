@@ -1,0 +1,44 @@
+extends ../layout
+block content
+  div
+    h2 Faça login
+    form(action="/authenticate/signin", method="post") 
+      div
+        label(for="email") Username ou email
+        input(type="text", name="email", required="required", id="email")
+      div
+        label(for="password") Senha
+        input(type="password", name="password", required="required", id="password")
+      div 
+        button(type="submit") Fazer login 
+  div
+    h2 Registre-se
+    form(action="/authenticate/signup", method="post", enctype="multipart/form-data")
+      div
+        label(for="name-singup") Name
+        input(type="text", name="name", required="required", id="name-singup")
+      div
+        label(for="username-singup") Username
+        input(type="text", name="username", required="required", id="username-singup")
+      div
+        label(for="email-singup") Email
+        input(type="email", name="email", required="required", id="email-singup")
+      div
+        label(for="phone-singup") Phone
+        input(type="phone", name="phone", required="required", id="phone-singup")
+      div
+        label(for="password-singup") Senha
+        input(type="password", name="password", required="required", id="password-singup")
+      div
+        label(for="file-singup") Avatar
+        input(type="file", name="avatar", accept="image/*" required="required", id="file-singup")
+      div 
+        button(type="submit") Finalizar registro
+  div
+    h2 Esqueci a senha
+    form(action="/authenticate/forgot", method="post") 
+      div
+        label(for="email-forgot") Email
+        input(type="email", name="email", required="required", id="email-forgot")
+      div 
+        button(type="submit") Finalizar

@@ -1,0 +1,45 @@
+extends ../layout
+block content
+  h3 Meus cursos 
+  if !courses.length
+    p Nenhum curso encontrado
+  else
+    ul
+      each course in courses
+        li= course.name  
+          a(href="/courses/course/" + course.id) | Acessar 
+
+  h3 Cadastrar um novo curso
+  form(action="/courses/register" method="POST")
+    div 
+      label(for="name") Nome do curso
+      input(type="text" name="name" id="name")
+    div
+      label(for="icon") Ícone do curso
+      input(type="text" name="icon" id="icon")
+    div
+      label(for="description") Descrição do curso
+      input(type="text" name="description" id="description")
+    div
+      label(for="university") Universidade
+      input(type="text" name="university" id="university")
+    div
+      label(for="location") Localização
+      input(type="text" name="location" id="location")
+    div
+      label(for="status") Status
+      input(type="text" name="status" id="status")
+    div
+      label(for="level") Nível
+      input(type="text" name="level" id="level")
+    div
+      label(for="type") Tipo
+      input(type="text" name="type" id="type")
+    div
+      label(for="startedIn") Início
+      input(type="date" name="startedIn" id="startedIn")
+    div
+      label(for="finishedIn") Término
+      input(type="date" name="finishedIn" id="finishedIn")
+    div
+      button(type="submit") Cadastrar

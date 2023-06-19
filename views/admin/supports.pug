@@ -1,0 +1,9 @@
+extends ../layout
+block content
+  if !supports
+    h1 Nenhum suporte encontrado
+  else
+    h1 Suportes
+    div 
+      echo support in supports
+        p #{support.name} 

@@ -1,0 +1,118 @@
+extends ../layout
+block content
+  style.
+    .message {
+      width: 100%;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      margin: 10px;
+    }
+    
+    .message.send-me {
+      justify-content: flex-end;
+    }
+
+    .message.send-friend {
+      justify-content: flex-start;
+    }
+
+    .message.send-me img {
+      margin-left: 10px;
+    }
+    
+    .message.send-friend img {
+      margin-right: 10px;
+    }
+
+    .text-message {
+      color: white;
+    }
+
+    .message.send-me .text-message {
+      background-color: #007bff;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 80%;
+    } 
+
+    .message.send-friend .text-message {
+      background-color: #6c757d;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 80%;
+    }
+
+  if chat[0].from.id === user.id
+    div(style="display: flex; justify-content: flex-start; align-items: center;")
+      img(src=chat[0].to.avatar, alt=chat[0].to.name, style="width: 80px; height: 80px; border-radius: 50%; margin: 10px;")
+      div 
+        h3 #{chat[0].to.name} - #{chat[0].to.username}
+        p #{chat[0].to.email} 
+        small Visto por último em #{new Date(chat[0].to.accesses[chat[0].to.accesses.length - 1].date).toLocaleString("pt-BR")}
+  else
+    div(style="display: flex; justify-content: flex-start; align-items: center;")
+      img(src=chat[0].from.avatar, alt=chat[0].from.name, style="width: 80px; height: 80px; border-radius: 50%; margin: 10px;")
+      div 
+        h3 #{chat[0].from.name} - #{chat[0].from.username}
+        p #{chat[0].from.email} 
+        small Visto por último em #{new Date(chat[0].from.accesses[chat[0].from.accesses.length - 1].date).toLocaleString("pt-BR")}
+  - let me = chat[0].from.id === user.id ? chat[0].from : chat[0].to;
+  - let friend = chat[0].from.id === user.id ? chat[0].to : chat[0].from;
+
+  if chat[0].messages.length > 0
+    div(style="width: 100%; height: 450px; overflow-y: scroll; border: 1px solid #000; border-radius: 5px; margin: 10px;")    
+      - let messages = []
+      - let date = new Date(chat[0].messages[0].createdAt).toLocaleDateString("pt-BR")
+      - messages.push({date: date, messages: []})
+      - messages[0].messages.push(chat[0].messages[0])
+      - for (let i = 1; i < chat[0].messages.length; i++) {
+      -   let newDate = new Date(chat[0].messages[i].createdAt).toLocaleDateString("pt-BR")
+      -   if (newDate === date) {
+      -     messages[messages.length - 1].messages.push(chat[0].messages[i])
+      -   } else {
+      -     messages.push({date: newDate, messages: []})
+      -     messages[messages.length - 1].messages.push(chat[0].messages[i])
+      -     date = newDate
+      -   }
+      - }
+
+      - let TODAY = new Date();
+
+      - for (let message of messages)
+        div(style="width: 100%; display: flex; justify-content: center; align-items: center; margin: 10px;")
+          p(style="background-color: #000; color: white; padding: 10px; border-radius: 5px;") #{message.date === TODAY.toLocaleDateString("pt-BR") ? 'Hoje' : message.date === new Date(TODAY.setDate(TODAY.getDate() - 1)).toLocaleDateString("pt-BR") ? 'Ontem' : message.date}
+        each msg in message.messages
+          div(class=`message ${msg.sendBy === user.id ? 'send-me' : 'send-friend'}`)
+            if msg.sendBy != user.id
+              img(src=friend.avatar, alt=friend.name, style="width: 40px; height: 40px; border-radius: 50%;")
+            
+            p(class="text-message") #{msg.content}
+              br
+              small #{new Date(msg.createdAt).toLocaleString("pt-BR", {hour: 'numeric', minute: 'numeric'})} #{msg.sendBy === user.id ? msg.read ? ' - Visto' : ' - Não lida' : ''} 
+              
+            if msg.sendBy === user.id
+              img(src=me.avatar, alt=me.name, style="width: 40px; height: 40px; border-radius: 50%;")
+
+  div(style="display: flex; justify-content: flex-start; align-items: center;")
+    input(type="text", id="message", placeholder="Digite sua mensagem", style="width: 100%; height: 50px; border: 1px solid #000; border-radius: 5px; padding: 10px; margin: 10px;")
+    button(type="button", onclick=`sendMessage('${chat[0].id}')`, style="width: 100px; height: 50px; border: 1px solid #000; border-radius: 5px; padding: 10px; margin: 10px;") Enviar
+
+  script.
+    function sendMessage(id){
+      fetch(`/friends/send/message/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          content: document.getElementById("message").value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 200) {
+          location.reload()
+        } console.log(data)
+      })
+    }

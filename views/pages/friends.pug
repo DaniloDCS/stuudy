@@ -1,0 +1,158 @@
+extends ../layout
+block content
+  h3 Amigos
+  if friends.length > 0
+    each friend in friends
+      div(style="display: flex; justify-content: flex-start; align-items: center;")
+        if user.id === friend.to.id
+          img(src=friend.from.avatar, alt=friend.from.name, style="width: 100px; height: 100px; border-radius: 50%; margin: 10px;")
+          div 
+            a(href="/u/"+friend.from.username)
+              h3 #{friend.from.name} - #{friend.from.username}
+            p #{friend.from.email} 
+            br
+        else
+          img(src=friend.to.avatar, alt=friend.to.name, style="width: 100px; height: 100px; border-radius: 50%; margin: 10px;")
+          div 
+            a(href="/u/"+friend.to.username)
+              h3 #{friend.to.name} - #{friend.to.username}
+            p #{friend.to.email} 
+            br
+        div
+          button(type="button", onclick=`undoFriend('${friend.id}')`) Desfazer amizade
+          a(href="/friends/chat/"+friend.id) Conversar (#{friend.messages.filter(m => m.read === false && m.sendBy !== user.id).length})
+  else
+    p Procure por amigos
+
+  hr
+
+  h3 Solicitações enviadas
+  if sends.length > 0
+    each send in sends
+      div(style="display: flex; justify-content: flex-start; align-items: center;")
+        img(src=send.to.avatar, alt=send.to.name, style="width: 100px; height: 100px; border-radius: 50%; margin: 10px;")
+        div
+          a(href="/u/"+send.to.username)
+            h3 #{send.to.name} - #{send.to.username}
+          p #{send.to.email} 
+          br
+          button(type="button", onclick=`cancelFriend('${send.id}')`) Cancelar solicitação
+  else
+    p Você não enviou nenhuma solicitação
+
+  hr
+
+  h3 Solicitações recebidas
+  if reicived.length > 0
+    each reicive in reicived
+      div(style="display: flex; justify-content: flex-start; align-items: center;")
+        img(src=reicive.from.avatar, alt=reicive.from.name, style="width: 100px; height: 100px; border-radius: 50%; margin: 10px;")
+        div 
+          a(href="/u/"+reicive.from.username)
+            h3 #{reicive.from.name} - #{reicive.from.username}
+          p #{reicive.from.email} 
+          br
+          button(type="button", onclick=`refuseFriend('${reicive.id}')`) Recusar solicitação
+          button(type="button", onclick=`acceptFriend('${reicive.id}')`, style="margin-left: 10px;") Aceitar solicitação
+  else
+    p Você não recebeu nenhuma solicitação
+
+  hr
+
+  script.
+    
+    function cancelFriend(id){
+      fetch(`/friends/solicitation/cancel/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 200) {
+          location.reload()
+        } console.log(data)
+      })
+    }
+
+    function acceptFriend(id){
+      fetch(`/friends/solicitation/accept/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 200) {
+          location.reload()
+        } console.log(data)
+      })
+    }
+
+    function sendFriend(id){
+      fetch(`/friends/send/solicitation/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 200) {
+          location.reload()
+        } console.log(data)
+      })
+    }
+
+    function refuseFriend(id){
+      fetch(`/friends/solicitation/refuse/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 200) {
+          location.reload()
+        } console.log(data)
+      })
+    }
+
+    function undoFriend(id){
+      fetch(`/friends/undo/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 200) {
+          location.reload()
+        } console.log(data)
+      })
+    }
+
+    function bloqFriend(id){
+      fetch(`/friends/bloq/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 200) {
+          location.reload()
+        } console.log(data)
+      })
+    }

@@ -1,0 +1,76 @@
+extends ../layout
+block content
+  h1 #{period.icon}| #{period.name}
+
+  h2 Disciplinas
+  if !period.disciplines.length
+    p Nenhuma disciplina encontrada
+  else
+    ul
+      each discipline in period.disciplines
+        li= discipline.name  
+          a(href="/disciplines/discipline/" + discipline.id) | Acessar | #{discipline.status}
+          a(href="/disciplines/discipline/" + discipline.id + "/" + period.id + "/delete") | Remover
+
+  h2 Cadastrar uma nova disciplina
+  form(action="/disciplines/discipline/register" method="POST")
+    div   
+      label(for="name") Nome da disciplina
+      input(type="text" name="name" id="name")
+    div
+      label(for="icon") Ícone
+      input(type="text" name="icon" id="icon", value="📚")
+    div
+      label(for="description") Descrição
+      input(type="text" name="description" id="description")
+    div
+      label(for="status") Status
+      select(name="status" id="status")
+        option(value="studying", selected) Estudando
+        option(value="concluded") Concluído
+        option(value="dropped") Abandonado
+        option(value="cancelled") Cancelado
+    div 
+      label(for="workload") Carga horária
+      input(type="number" name="workload" id="workload")
+    div 
+      label(for="credits") Créditos
+      input(type="number" name="credits" id="credits")
+    #teachers 
+      label(for="teachers") Professores
+      .teacher  
+        input(type="text" name="teachers[]" id="teachers")
+        button(type="button" onclick="removeTeacher(this)") Remover professor
+    
+    div
+      button(type="button" onclick="addTeacher()") Adicionar professor
+      button(type="submit") Cadastrar
+
+  script. 
+    function addTeacher() {
+      const teachers = document.querySelector('#teachers');
+      const div = document.createElement('div');
+      div.classList.add('teacher');
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = 'teachers[]';
+      
+      const button = document.createElement('button');
+      button.type = 'button';
+
+      button.onclick = function() {
+        removeTeacher(this);
+      }
+
+      button.innerHTML = 'Remover professor';
+
+      div.appendChild(input);
+      div.appendChild(button);
+
+      teachers.appendChild(div);
+    }
+
+    function removeTeacher(element) {
+      element.parentNode.remove();
+    }

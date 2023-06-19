@@ -1,0 +1,42 @@
+extends ../layout
+block content
+  h3 #{course.icon}| #{course.name}
+  h4 #{course.description}
+  br
+  table 
+    tr
+      each key in Object.keys(course.dados)
+        th= key
+    tr
+      each value in Object.values(course.dados)
+        td= value
+
+  br
+  h4 Períodos 
+  if !course.periods.length
+    p Nenhum período encontrado
+  else
+    ul
+      each period in course.periods
+        li= period.name  
+          a(href="/periods/period/" + period.id) | Acessar | #{period.status}
+
+  br
+  h4 Registrar um novo período
+  form(action="/periods/period/register" method="POST")
+    // name: string;
+      status: string;
+      disciplines: Discipline[];
+    div   
+      label(for="name") Nome do período
+      input(type="text" name="name" id="name")
+    div
+      label(for="status") Status
+      select(name="status" id="status")
+        option(value="studying") Estudando
+        option(value="concluded") Concluído
+        option(value="dropped") Abandonado
+        option(value="cancelled") Cancelado
+        option(value="wating") Aguardando
+    div
+      button(type="submit") Cadastrar

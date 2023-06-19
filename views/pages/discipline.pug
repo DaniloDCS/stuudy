@@ -1,0 +1,131 @@
+extends ../layout
+block content
+
+  style. 
+    .bulletins {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .bulletin {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid black;
+      padding: 10px;
+      margin: 10px;
+    }
+
+  a(href="/periods/period/" + period.id) Voltar para disciplinas
+
+  textarea(name="", cols="30", rows="10") #{JSON.stringify(discipline, null, 2)}
+
+  h1 #{discipline.icon} | #{discipline.name}
+
+  h2 Aulas 
+  each unity in discipline.unities
+    p #{unity.title} - #{unity.id}
+    table 
+      tr 
+        th Data
+        th Conteúdo
+        th Ações
+      each _class in unity.classes
+        tr 
+          td #{_class.date}
+          td #{_class.content}
+          td 
+            a(href="/disciplines/discipline/" + discipline.id + "/lesson/" + _class.id) | Acessar
+            a(href="/disciplines/discipline/" + discipline.id + "/lesson/" + _class.id + "/delete") | Remover
+
+    
+  h2 Cadastrar uma nova aula
+
+  form(action="/disciplines/discipline/class/register" method="POST")
+    div   
+      label(for="unityId") unityId
+      select#unityId(name="unityId")
+        each unity in discipline.unities
+          option(value="#{unity.id}") #{unity.title} 
+    div   
+      label(for="date") Data
+      input(type="date" name="date" id="date")
+    div   
+      label(for="content") Conteúdo
+      input(type="text" name="content" id="content")
+    div   
+      label(for="description") Descrição
+      input(type="text" name="description" id="description")
+    div   
+      label(for="quantity") Quantidade
+      input(type="number" name="quantity" id="quantity")
+    div   
+      label(for="type") Tipo
+      input(type="text" name="type" id="type")
+    div   
+      label(for="IWasPresent") Estava presente
+      input(type="checkbox" name="IWasPresent" id="IWasPresent")
+    div 
+      button(type="submit") Cadastrar
+  
+
+  h2 Buletins
+  form.bulletins(action="/disciplines/bulletins/update" method="POST", id="bulletins")  
+    each bulletin, index in discipline.bulletins
+      div
+        .bulletin 
+          input(type="hidden", value=bulletin.id, readonly, name=`${bulletin.type}${index}[id]`, required)
+          input(type="text", value=bulletin.title, readonly, name=`${bulletin.type}${index}[title]`, required)
+          p Nota
+          input(type="number", value=bulletin.value, name=`${bulletin.type}${index}[value]`, min="0", max="10", step="0.1", required)
+          p Peso
+          input(type="number", value=bulletin.weight, name=`${bulletin.type}${index}[weight]`, min="0", max="10", step="0.1", required)
+          p Tipo
+          input(type="text", value=bulletin.type, readonly, name=`${bulletin.type}${index}[type]`, required)
+        if index > 1 && index < discipline.bulletins.length - 2
+          button(type="button", onclick="removeNote(this)") Remover
+      
+    button(type="submit") Atualizar
+    button(type="button", onclick="addNote()") Adicionar
+
+  h2 Provas
+
+  h2 Trabalhos
+
+  h2 Notas
+
+  h2 Resumos 
+
+  h2 Livros 
+
+  h2 Lembretes
+
+  script. 
+    function removeNote(e) {
+      e.parentNode.remove()
+    }
+
+    let quantity = document.querySelectorAll('.bulletin').length - 2;
+
+    function addNote() {
+      quantity += 1;
+      const bulletins = document.querySelector('#bulletins')
+      const bulletin = document.createElement('div')
+
+      bulletin.innerHTML = `
+        <div class="bulletin">
+          <input type="text" value="Avaliação ${bulletins.children.length - 3}" readonly name="avaliation${quantity}[title]" required>
+          <p>Nota</p>
+          <input type="number" value="" name="avaliation${quantity}[value]" min="0" max="10" step="0.1" required>
+          <p>Peso</p>
+          <input type="number" value="1" name="avaliation${quantity}[weight]" min="0" max="10" step="0.1" required>
+          <p>Tipo</p>
+          <input type="text" value="evaluation" readonly name="avaliation${quantity}[type]" required>
+        </div>
+        <button type="button" onclick="removeNote(this)">Remover</button>
+      `
+
+      // adicionar o elemento criado ao bulletins, 2 filhos antes
+      bulletins.insertBefore(bulletin, bulletins.children[bulletins.children.length - 4])      
+    }

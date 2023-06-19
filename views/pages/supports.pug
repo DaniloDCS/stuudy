@@ -1,0 +1,31 @@
+extends ../layout
+block content
+  if !supports
+    h1 Você não tem suportes registrados
+  else
+    h1 Meus Supports
+    div 
+      each support, index in supports
+        div(class=`support ${support.status}`)
+          h3 #{support.title} - #{support.status} - ##{supports.length - index}
+          h4 Usuário: 
+            a(href=`/u/${support.user.username}`, target="__blank") #{support.user.name}
+            |  - #{support.user.username}
+          p #{support.content}
+          if support.status == 'attending'
+            p Atendente: 
+              a(href=`/u/${support.attending.username}`, target="__blank") #{support.attending.name}
+              |  - #{support.attending.username}
+          div
+            a(href=`/support/${support.id}`) Acompanhar
+        
+  h1 Criar um novo suporte
+  form(action="/support/register", method="post") 
+    div
+      label(for="title") Title
+      input(type="text", name="title", title="title", required="required", id="title")
+    div
+      label(for="description") Descreva o problema com o máximo de detalhes possíveis
+      textarea(name="description", required="required", id="description") 
+    div 
+      button(type="submit") Enviar para o suporte

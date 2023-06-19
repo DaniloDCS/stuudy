@@ -1,0 +1,161 @@
+extends ../layout
+block content
+  div(style="display: flex; justify-content: flex-start; align-items: center;")
+    img(src=user.avatar, alt=user.name, style="width: 100px; height: 100px; border-radius: 50%; margin: 10px;")
+    div 
+      h3 Olá, #{user.name} - #{user.username}
+      p #{user.email}
+
+  br
+  hr
+  br
+
+  .send-all 
+    h2 Enviar notificação para todos os usuários
+    form(action="/admin/send-all", method="POST", id="send-all")
+      div
+        label(for="title") Título
+        input(type="text", name="title", placeholder="Título")
+      div 
+        label(for="content") Conteúdo
+        textarea(name="content", placeholder="Conteúdo")
+      div
+        button(type="submit") Enviar
+      
+  br
+  hr
+  br
+
+  h2 Suportes
+  if supports
+    // pending, attending, finished
+    each support, index in supports.sort((a, b) => { a.status > b.status ? 1 : a.status < b.status ? -1 : 0 }).reverse()
+      div(class=`support ${support.status}`)
+        a(href=`/admin/support/${support.id}`, target="__blank")
+          h3 #{support.title} - #{support.status} - ##{supports.count}
+        h4 Usuário: 
+          a(href=`/u/${support.user.username}`, target="__blank") #{support.user.name}
+          |  - #{support.user.username}
+        p #{support.content}
+        if support.status == 'pending'
+          button(class="attending", onclick=`attending('${support.id}')`) Iniciar atendimento
+        else if support.status == 'attending'
+          h4 Atendente: 
+            a(href=`/u/${support.attending.username}`, target="__blank") #{support.attending.name}
+            |  - #{support.attending.username}
+          if support.attending.id == user.id
+            button(class="attending", onclick=`finish('${support.id}')`) Finalizar atendimento
+
+  else 
+    h2 Não há suportes pendentes
+
+  br
+  hr
+  br
+
+  h2 Usuários
+  if users.users
+    each account in users.users
+      if account.id != user.id
+        div(style="display: flex; justify-content: flex-start; align-items: center;")
+          img(src=account.avatar, alt=account.name, style="width: 100px; height: 100px; border-radius: 50%; margin: 10px;")
+          div 
+            a(href=`/u/${account.username}`, target="__blank")
+              h3(style="padding: 10px 0;") #{account.name} - #{account.username} 
+                span(class=`${account.admin ? 'admin' : 'user'}`) #{account.admin ? 'Adiministrador' : 'Usúario'}
+            p #{account.email} - #{account.phone}
+            p ùltimo acesso: #{account.accesses.length > 0 ? new Date(account.accesses[account.accesses.length - 1].date).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }) : 'Nunca acessou'}
+            if account.username != '@danilo'
+              button(class="delete", onclick=`turnAdmin('${account.id}')`) #{account.admin ? 'Remover' : 'Tornar'} admintrador
+  else 
+    h2 Nenhum usuário
+  
+  script. 
+    const all = document.getElementById('send-all');
+
+    all.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const title = e.target.title.value;
+      const content = e.target.content.value;
+
+      const response = await fetch('/admin/send-all', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title,
+          content
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.message === 'Mensagem enviada com sucesso!') {
+        alert('Notificação enviada com sucesso!');
+      } else {
+        alert('Erro ao enviar notificação!');
+      }
+    });
+
+    function turnAdmin(id) {
+      fetch(`/admin/turn-admin/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          admin: true
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          alert('Modifição realizada!');
+          location.reload();
+        } else {
+          alert('Erro ao tornar usuário admin!');
+        }
+      })
+    }
+
+    function attending(id) {
+      fetch(`/admin/attending/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          alert('Atendimento iniciado!');
+          location.reload();
+        } else {
+          alert('Erro ao iniciar atendimento!');
+        }
+      })
+    }
+
+    function finish(id) {
+      fetch(`/admin/finish/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          alert('Atendimento finalizado!');
+          location.reload();
+        } else {
+          alert('Erro ao finalizar atendimento!');
+        }
+      })
+    }
+
+

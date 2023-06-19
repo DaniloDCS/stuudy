@@ -1,0 +1,37 @@
+extends ../layout
+block content
+  h1 Meu perfil
+  div
+    h2 Informações pessoais
+    form(action="/me/update", method="post") 
+      div
+        label(for="name") Nome
+        input(type="text", name="name", required="required", id="name", value=user.name)
+      div
+        label(for="username") Username
+        input(type="text", name="username", required="required", id="username", value=user.username)
+      div
+        label(for="email") Email
+        input(type="email", name="email", required="required", id="email", value=user.email)
+      div
+        label(for="phone") Phone
+        input(type="phone", name="phone", required="required", id="phone", value=user.phone)
+      div 
+        label(for="avatar") Avatar
+        input(type="file", name="avatar", id="avatar", accept="image/*", required="required")
+      div 
+        label(for="biography") Biografia
+        textarea(name="biography", id="biography", required="required") #{user.biography} 
+      div 
+        button(type="submit") Atualizar informações
+  div
+    h2 Alterar senha
+    form(action="/me/update", method="post") 
+      div
+        label(for="password") Senha atual
+        input(type="password", name="password", required="required", id="password")
+      div
+        label(for="new-password") Nova senha
+        input(type="password", name="new-password", required="required", id="new-password")
+      div 
+        button(type="submit") Atualizar senha
