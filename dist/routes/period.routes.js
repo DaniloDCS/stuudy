@@ -6,88 +6,169 @@ var _Period = require('../models/Period');
 var _User = require('../models/User');
 
 class PeriodRoutes {
-	
+  
 
-	constructor() {
-		this.router = _express.Router.call(void 0, );
-		this.routes();
-	}
+  constructor() {
+    this.router = _express.Router.call(void 0, );
+    this.routes();
+  }
 
-	 routes() {
+   routes() {
+    this.router.get("/p/:id", async (req, res) => {
+      const { id } = req.params,
+        user = new (0, _User.User)(_App2.default.get("user"));
 
-		this.router.get('/period/:id', async (req, res) => {
-			const { id } = req.params;
-			const user = new (0, _User.User)(_App2.default.get('user'));
+      if (!_App2.default.get("course")) return res.redirect("/courses");
 
-			const { data, error } = await _connection.connection.from('Courses').select('*').match({ userId: user.getId() }).single();
-			if (error) return res.status(400).json({ message: 'Erro ao buscar curso', error });
+      const course = new (0, _Course.Course)(_App2.default.get("course"));
+      let period = course.getPeriod(id);
 
-			const course = new (0, _Course.Course)(data);
-			const period = new (0, _Period.Period)(course.getPeriod(id));
+      if (!period) return res.redirect("/courses/");
 
-			if (period.getId() === undefined) return res.redirect('/courses/course/' + course.getId());
+      period = new (0, _Period.Period)(period);
 
-			_App2.default.set('period', period);
+      _App2.default.set("period", period);
 
-			return res.render('pages/period', { title: period.getName(), user, course, period });
-		});
+      return res.redirect("/period");
+    });
 
-		this.router.post('/period/register', async (req, res) => {
-			const { name, credits, workload, status, disciplines  } = req.body;
-			const user = new (0, _User.User)(_App2.default.get('user'));
-			const course = new (0, _Course.Course)(_App2.default.get('course'));
+    this.router.get("/", async (req, res) => {
+      const user = new (0, _User.User)(_App2.default.get("user"));
 
-			let period = new (0, _Period.Period)({ name, credits, workload, status, disciplines });
-			course.setPeriod(period);
+      if (!_App2.default.get("course")) return res.redirect("/courses");
+      if (!_App2.default.get("period")) return res.redirect("/course");
 
-			period = new (0, _Period.Period)(course.getPeriod(period.getId()));
+      const course = new (0, _Course.Course)(_App2.default.get("course")),
+        period = _App2.default.get("period");
 
-			const { data, error } = await _connection.connection.from('Courses').update(course).match({ id: course.getId(), userId: user.getId() }).single();
-			if (error) return res.status(400).json({ message: 'Erro ao cadastrar período', error });
+      return res.render("pages/period", {
+        title: period.getName(),
+        user,
+        course,
+        period,
+      });
+    });
 
-			_App2.default.set('course', data);
-			_App2.default.set('period', period);
+    this.router.post("/register", async (req, res) => {
+      const { name, icon, status } = req.body,
+        user = new (0, _User.User)(_App2.default.get("user")),
+        course = new (0, _Course.Course)(_App2.default.get("course"));
 
-			return res.redirect(`/periods/period/${period.getId()}`);
-		});		
+      if (!name || !status || !course) return res.redirect("/course");
 
-		this.router.post('/period/update', async (req, res) => {
-			const { id, name, credits, workload, status, disciplines  } = req.body;
-			const user = new (0, _User.User)(_App2.default.get('user'));
-			const course = new (0, _Course.Course)(_App2.default.get('course'));
+      const period = new (0, _Period.Period)({
+        name,
+        icon,
+        status,
+      });
 
-			let period = new (0, _Period.Period)({ id, name, credits, workload, status, disciplines });
-			course.updatePeriod(period);
+      course.setPeriod(period);
 
-			period = new (0, _Period.Period)(course.getPeriod(id));
+      const { data, error } = await _connection.connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res
+          .status(400)
+          .json({ message: "Erro ao cadastrar período", error });
 
-			const { data, error } = await _connection.connection.from('Courses').update(course).match({ id: course.getId(), userId: user.getId() }).single();
-			if (error) return res.status(400).json({ message: 'Erro ao atualizar período', error });
+      _App2.default.set("course", data);
+      _App2.default.set("period", period);
 
-			_App2.default.set('course', data);
-			_App2.default.set('period', period);
+      return res.redirect("/period");
+    });
 
-			return res.redirect(`/periods/period/${period.getId()}`);
-		});
+    this.router.post("/update", async (req, res) => {
+      const { name, icon, status } = req.body;
 
-		this.router.post('/period/delete', async (req, res) => {
-			const { id } = req.body;
-			const user = new (0, _User.User)(_App2.default.get('user'));
-			const course = new (0, _Course.Course)(_App2.default.get('course'));
+      if (!_App2.default.get("course")) return res.redirect("/courses");
+      if (!_App2.default.get("period")) return res.redirect("/course");
 
-			course.deletePeriod(id);
+      const user = new (0, _User.User)(_App2.default.get("user")),
+        course = new (0, _Course.Course)(_App2.default.get("course"));
 
-			const { data, error } = await _connection.connection.from('Courses').update(course).match({ id: course.getId(), userId: user.getId() }).single();
-			if (error) return res.status(400).json({ message: 'Erro ao remover período', error });
+      let period = new (0, _Period.Period)(_App2.default.get("period"));
 
-			_App2.default.set('course', data);
-			_App2.default.set('period', {});
+      if (name) period.setName(name);
+      if (icon) period.setIcon(icon);
+      if (status) period.setStatus(status);
 
-			return res.redirect('/course/' + course.getId());
-		});
-		
-	}
+      course.updatePeriod(period);
 
+      const { data, error } = await _connection.connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res
+          .status(400)
+          .json({ message: "Erro ao atualizar período", error });
+
+      _App2.default.set("course", data);
+      _App2.default.set("period", period);
+
+      return res.redirect('/period/p/' + period.getId());
+    });
+
+    this.router.get("/delete", async (req, res) => {
+      const user = new (0, _User.User)(_App2.default.get("user"));
+
+      if (!_App2.default.get("course")) return res.redirect("/courses");
+      if (!_App2.default.get("period")) return res.redirect("/course");
+
+      const course = new (0, _Course.Course)(_App2.default.get("course")),
+       period = new (0, _Period.Period)(_App2.default.get("period"));
+
+      course.deletePeriod(period.getId());
+
+      const { data, error } = await _connection.connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res
+          .status(400)
+          .json({ message: "Erro ao remover período", error });
+
+      _App2.default.set("course", data);
+      _App2.default.set("period", {});
+
+      return res.redirect("/course/c/" + course.getId());
+    });
+
+    this.router.get("/conclude", async (req, res) => {
+      const user = new (0, _User.User)(_App2.default.get("user"));
+
+      if (!_App2.default.get("course")) return res.redirect("/courses");
+      if (!_App2.default.get("period")) return res.redirect("/course");
+
+      const course = new (0, _Course.Course)(_App2.default.get("course")),
+        period = new (0, _Period.Period)(_App2.default.get("period"));
+
+      period.setStatus("Concluído");
+      course.updatePeriod(period);
+      course.setWorkloadAndCredits();
+
+      const { data, error } = await _connection.connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res
+          .status(400)
+          .json({ message: "Erro ao remover período", error });
+
+      _App2.default.set("course", data);
+      _App2.default.set("period", period);
+
+      return res.redirect("/course/c/" + course.getId());
+    });
+  }
 }
 
 exports. default = new PeriodRoutes().router;

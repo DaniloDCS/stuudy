@@ -17,6 +17,7 @@
 
 
 
+
 class User  {
   
   
@@ -32,22 +33,40 @@ class User  {
   
   
   
+  
 
-  constructor({ id, userId, avatar, username, name, birthday, biography, email, phone, admin, accesses, network, createdAt, updatedAt }) {;User.prototype.__init.call(this);User.prototype.__init2.call(this);User.prototype.__init3.call(this);User.prototype.__init4.call(this);User.prototype.__init5.call(this);User.prototype.__init6.call(this);User.prototype.__init7.call(this);User.prototype.__init8.call(this);User.prototype.__init9.call(this);User.prototype.__init10.call(this);User.prototype.__init11.call(this);User.prototype.__init12.call(this);User.prototype.__init13.call(this);User.prototype.__init14.call(this);User.prototype.__init15.call(this);User.prototype.__init16.call(this);User.prototype.__init17.call(this);User.prototype.__init18.call(this);User.prototype.__init19.call(this);User.prototype.__init20.call(this);User.prototype.__init21.call(this);User.prototype.__init22.call(this);User.prototype.__init23.call(this);User.prototype.__init24.call(this);User.prototype.__init25.call(this);User.prototype.__init26.call(this);User.prototype.__init27.call(this);User.prototype.__init28.call(this);User.prototype.__init29.call(this);
+  constructor({
+    id,
+    userId,
+    avatar,
+    username,
+    name,
+    birthday,
+    biography,
+    email,
+    phone,
+    admin,
+    theme,
+    accesses,
+    network,
+    createdAt,
+    updatedAt,
+  }) {;User.prototype.__init.call(this);User.prototype.__init2.call(this);User.prototype.__init3.call(this);User.prototype.__init4.call(this);User.prototype.__init5.call(this);User.prototype.__init6.call(this);User.prototype.__init7.call(this);User.prototype.__init8.call(this);User.prototype.__init9.call(this);User.prototype.__init10.call(this);User.prototype.__init11.call(this);User.prototype.__init12.call(this);User.prototype.__init13.call(this);User.prototype.__init14.call(this);User.prototype.__init15.call(this);User.prototype.__init16.call(this);User.prototype.__init17.call(this);User.prototype.__init18.call(this);User.prototype.__init19.call(this);User.prototype.__init20.call(this);User.prototype.__init21.call(this);User.prototype.__init22.call(this);User.prototype.__init23.call(this);User.prototype.__init24.call(this);User.prototype.__init25.call(this);User.prototype.__init26.call(this);User.prototype.__init27.call(this);User.prototype.__init28.call(this);User.prototype.__init29.call(this);User.prototype.__init30.call(this);User.prototype.__init31.call(this);
     this.id = id || _uuid.v4.call(void 0, );
     this.userId = userId;
-    this.avatar = avatar || '/public/images/avatars/default.png';
+    this.avatar = avatar || "/public/images/avatars/default.png";
     this.username = username;
     this.name = name;
-    this.birthday = birthday || new Date('2000-01-01');
-    this.biography = biography || 'Hello World!';
+    this.birthday = birthday || new Date("2000-01-01");
+    this.biography = biography || "Hello World!";
     this.email = email;
     this.phone = phone;
     this.admin = admin || false;
+    this.theme = theme || "theme-blue";
     this.accesses = accesses || [];
     this.network = network || [];
     this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
+    this.updatedAt = new Date();
   }
 
    __init() {this.getId = () => this.id}
@@ -102,13 +121,19 @@ class User  {
     this.setUpdatedAt();
   }}
 
-   __init19() {this.getAccesses = () => this.accesses}
-   __init20() {this.setAccesses = (accesses) => {
+   __init19() {this.getTheme = () => this.theme}
+   __init20() {this.setTheme = (theme) => {
+    this.theme = theme;
+    this.setUpdatedAt();
+  }}
+
+   __init21() {this.getAccesses = () => this.accesses}
+   __init22() {this.setAccesses = (accesses) => {
     if (this.accesses.length > 9) this.accesses = this.accesses.slice(1, 10);
     if (accesses) this.accesses.push(accesses);
     this.setUpdatedAt();
   }}
-   __init21() {this.setExitAccesses = (accesses) => {
+   __init23() {this.setExitAccesses = (accesses) => {
     this.accesses = this.accesses.map((item) => {
       if (accesses && item.id === accesses.id) {
         item.exit = new Date();
@@ -120,32 +145,34 @@ class User  {
     this.setUpdatedAt();
   }}
 
-   __init22() {this.getNetwork = () => this.network}
-   __init23() {this.setNetwork = (network) => {
+   __init24() {this.getNetwork = () => this.network}
+   __init25() {this.setNetwork = (network) => {
     this.network.push(network);
     this.setUpdatedAt();
   }}
-   __init24() {this.removeNetwork = (network) => {
-    this.network = this.network.filter((item) => item.id !== network.id);
+   __init26() {this.removeNetwork = (network) => {
+    this.network = this.network.filter(
+      (item) => item.id !== network.id
+    );
 
     this.setUpdatedAt();
   }}
 
-   __init25() {this.getCreatedAt = () => this.createdAt}
+   __init27() {this.getCreatedAt = () => this.createdAt}
 
-   __init26() {this.getUpdatedAt = () => this.updatedAt}
-   __init27() {this.setUpdatedAt = () => {
+   __init28() {this.getUpdatedAt = () => this.updatedAt}
+   __init29() {this.setUpdatedAt = () => {
     this.updatedAt = new Date();
   }}
 
-   __init28() {this.getFirstName = () => this.name.split(' ')[0]}
+   __init30() {this.getFirstName = () => this.name.split(" ")[0]}
 
-   __init29() {this.update = (user) => {
-    this.setAvatar(user.avatar || '/public/images/avatars/default.png');
+   __init31() {this.update = (user) => {
+    this.setAvatar(user.avatar || "/public/images/avatars/default.png");
     this.setUsername(user.username);
     this.setName(user.name);
-    this.setBirthday(user.birthday || new Date('2000-01-01'));
-    this.setBiography(user.biography || 'Hello World!');
+    this.setBirthday(user.birthday || new Date("2000-01-01"));
+    this.setBiography(user.biography || "Hello World!");
     this.setEmail(user.email);
     this.setPhone(user.phone);
     this.setAdmin(user.admin || false);
@@ -181,22 +208,29 @@ class Accesses  {
   
   
 
-  constructor({ id, date, location, exit, machine, browser, duration }) {;Accesses.prototype.__init30.call(this);Accesses.prototype.__init31.call(this);
+  constructor({
+    id,
+    date,
+    location,
+    exit,
+    machine,
+    browser
+  }) {;Accesses.prototype.__init32.call(this);Accesses.prototype.__init33.call(this);
     this.id = id || _uuid.v4.call(void 0, );
     this.date = date || new Date();
     this.location = {
       country: _optionalChain([location, 'optionalAccess', _ => _.country]) || "undefined",
       state: _optionalChain([location, 'optionalAccess', _2 => _2.state]) || "undefined",
       city: _optionalChain([location, 'optionalAccess', _3 => _3.city]) || "undefined",
-      ip: _optionalChain([location, 'optionalAccess', _4 => _4.ip]) || "undefined"
-    }
+      ip: _optionalChain([location, 'optionalAccess', _4 => _4.ip]) || "undefined",
+    };
     this.machine = machine || "undefined";
     this.browser = browser || "undefined";
     this.exit = exit || null;
     this.duration = this.calculateDuration();
   }
 
-   __init30() {this.create = () => {
+   __init32() {this.create = () => {
     return new Accesses({
       id: this.id,
       date: this.date,
@@ -204,12 +238,12 @@ class Accesses  {
       machine: this.machine,
       browser: this.browser,
       exit: this.exit,
-      duration: this.duration
+      duration: this.duration,
     });
   }}
 
-   __init31() {this.calculateDuration = () => {
-    if (!this.exit) return '0h 0min 0s';
+   __init33() {this.calculateDuration = () => {
+    if (!this.exit) return "0h 0min 0s";
     const duration = this.exit.getTime() - this.date.getTime();
     const hours = Math.floor(duration / 3600000);
     const minutes = Math.floor(duration / 60000);
@@ -229,7 +263,21 @@ class Network {
   
   
 
-  constructor({ id, url, visualization, visits, createdAt, updatedAt }) {;Network.prototype.__init32.call(this);Network.prototype.__init33.call(this);Network.prototype.__init34.call(this);Network.prototype.__init35.call(this);Network.prototype.__init36.call(this);Network.prototype.__init37.call(this);Network.prototype.__init38.call(this);Network.prototype.__init39.call(this);Network.prototype.__init40.call(this);Network.prototype.__init41.call(this);Network.prototype.__init42.call(this);
+  constructor({
+    id,
+    url,
+    visualization,
+    visits,
+    createdAt,
+    updatedAt,
+  }
+
+
+
+
+
+
+) {;Network.prototype.__init34.call(this);Network.prototype.__init35.call(this);Network.prototype.__init36.call(this);Network.prototype.__init37.call(this);Network.prototype.__init38.call(this);Network.prototype.__init39.call(this);Network.prototype.__init40.call(this);Network.prototype.__init41.call(this);Network.prototype.__init42.call(this);Network.prototype.__init43.call(this);Network.prototype.__init44.call(this);
     this.id = id || _uuid.v4.call(void 0, );
     this.url = url;
     this.visualization = visualization || true;
@@ -238,41 +286,41 @@ class Network {
     this.updatedAt = updatedAt || new Date();
   }
 
-   __init32() {this.create = () => {
+   __init34() {this.create = () => {
     return new Network({
       id: this.id,
       url: this.url,
       visualization: this.visualization,
       visits: this.visits,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
     });
   }}
 
-   __init33() {this.getId = () => this.id}
+   __init35() {this.getId = () => this.id}
 
-   __init34() {this.getUrl = () => this.url}
-   __init35() {this.setUrl = (url) => {
+   __init36() {this.getUrl = () => this.url}
+   __init37() {this.setUrl = (url) => {
     this.url = url;
     this.setUpdatedAt();
   }}
 
-   __init36() {this.getVisualization = () => this.visualization || true}
-   __init37() {this.setVisualization = (visualization) => {
+   __init38() {this.getVisualization = () => this.visualization || true}
+   __init39() {this.setVisualization = (visualization) => {
     this.visualization = visualization;
     this.setUpdatedAt();
   }}
 
-   __init38() {this.getVisits = () => this.visits || 0}
-   __init39() {this.setVisits = () => {
+   __init40() {this.getVisits = () => this.visits || 0}
+   __init41() {this.setVisits = () => {
     this.visits = this.getVisits() + 1;
     this.setUpdatedAt();
   }}
 
-   __init40() {this.getCreatedAt = () => this.createdAt}
+   __init42() {this.getCreatedAt = () => this.createdAt}
 
-   __init41() {this.getUpdatedAt = () => this.updatedAt}
-   __init42() {this.setUpdatedAt = () => {
+   __init43() {this.getUpdatedAt = () => this.updatedAt}
+   __init44() {this.setUpdatedAt = () => {
     this.updatedAt = new Date();
   }}
 }
@@ -280,20 +328,23 @@ class Network {
 class Users {
   
 
-  constructor(users) {;Users.prototype.__init43.call(this);Users.prototype.__init44.call(this);Users.prototype.__init45.call(this);Users.prototype.__init46.call(this);Users.prototype.__init47.call(this);
+  constructor(users) {;Users.prototype.__init45.call(this);Users.prototype.__init46.call(this);Users.prototype.__init47.call(this);Users.prototype.__init48.call(this);Users.prototype.__init49.call(this);
     this.users = users;
   }
 
-   __init43() {this.getUsers = () => this.users}
+   __init45() {this.getUsers = () => this.users}
 
-   __init44() {this.getUser = (id) => this.users.find(user => user.getId() === id) || null}
+   __init46() {this.getUser = (id) =>
+    this.users.find((user) => user.getId() === id) || null}
 
-   __init45() {this.getUserByUsername = (username) => this.users.find(user => user.getUsername() === username) || null}
+   __init47() {this.getUserByUsername = (username) =>
+    this.users.find((user) => user.getUsername() === username) || null}
 
-   __init46() {this.getUserByEmail = (email) => this.users.find(user => user.getEmail() === email) || null}
+   __init48() {this.getUserByEmail = (email) =>
+    this.users.find((user) => user.getEmail() === email) || null}
 
-   __init47() {this.getUserByPhone = (phone) => this.users.find(user => user.getPhone() === phone) || null}
-
+   __init49() {this.getUserByPhone = (phone) =>
+    this.users.find((user) => user.getPhone() === phone) || null}
 }
 
 exports.User = User; exports.Users = Users; exports.Accesses = Accesses;

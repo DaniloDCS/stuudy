@@ -3,11 +3,6 @@ require('dotenv/config');
 var _http = require('http');
 var _socketio = require('socket.io');
 
-
-var _authenticate = require('./database/authenticate');
-const { auth, onlyAdmins, connecting } = _authenticate.authenticate.call(void 0, );
-
-
 const PORT = process.env.PORT || 3000;
 
 const server = _http.createServer.call(void 0, _App2.default);

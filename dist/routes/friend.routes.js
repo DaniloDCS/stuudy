@@ -102,7 +102,7 @@ class FriendsRoutes {
       let { data: dataNotify, error: errorNotify } = await _connection.connection.from('Notifies').update(notifies).match({ userId: account.getId() });
       if (errorNotify) return res.status(500).json({ message: 'Erro ao enviar notificação', error: errorNotify, status: 500 });
       
-      return res.status(200).json({ message: 'Solicitação responsida', status: 200 });
+      return res.status(200).json({ message: 'Solicitação responsida', status: 200, user });
     });  
 
     this.router.get('/friend/bloq/:id', async (req, res) => {

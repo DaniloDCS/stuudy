@@ -69,6 +69,7 @@ class Period  {
 
    updateDiscipline(discipline) {
     this.disciplines = this.disciplines.map(d => d.id === discipline.id ? discipline : d);
+    this.setWorkloadAndCredits();
   }
 
    updatePeriod(period) {
@@ -139,6 +140,8 @@ class Period  {
       let discipline = new (0, _Discipline.Discipline)(d);
       return acc + Number(discipline.getWorkloadCompleted());
     }, 0));
+
+    this.progress = Number(this.workloadCompleted / this.workload * 100);
   }}
 
    __init27() {this.setCra = (cra) => this.cra = cra}

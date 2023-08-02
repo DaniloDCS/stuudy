@@ -13,19 +13,7 @@ class CourseRoutes {
   }
 
    routes() {
-    this.router.get('/', async (req, res) => {
-      const user = new (0, _User.User)(_App2.default.get('user'));
-
-      const { data: courses, error } = await _connection.connection.from('Courses').select('*').match({ userId: user.getId() });
-
-      return res.render('pages/courses', {
-        title: 'Cursos',
-        user,
-        courses
-      });
-    });
-
-    this.router.get('/course/:id', async (req, res) => {
+    this.router.get('/c/:id', async (req, res) => {
       const user = new (0, _User.User)(_App2.default.get('user'));
       const { id } = req.params;
 
@@ -35,11 +23,80 @@ class CourseRoutes {
       const course = new (0, _Course.Course)(courses[0]);
       _App2.default.set('course', course);
 
-      return res.render('pages/course', {
+      return res.redirect('/course');
+    });
+
+    this.router.get("/", async (req, res) => {
+      if (!_App2.default.get("course")) return res.redirect("/courses");
+
+      const user = new (0, _User.User)(_App2.default.get("user"));
+      const course = new (0, _Course.Course)(_App2.default.get("course"));
+
+      return res.render("pages/course", {
         title: course.getName(),
         user,
-        course
+        course,
       });
+    });
+
+    this.router.get("/delete/", async (req, res) => {
+      if (!_App2.default.get("course")) return res.redirect("/courses");
+
+      const user = new (0, _User.User)(_App2.default.get("user"));
+      const course = new (0, _Course.Course)(_App2.default.get("course"));
+
+      const { data, error } = await _connection.connection
+        .from("Courses")
+        .delete()
+        .match({ id: course.getId(), userId: user.getId() });
+        
+      if (error) return res.json({ error });
+
+      _App2.default.set("course", null);
+
+      return res.redirect("/courses");
+    });
+
+    this.router.post("/update", async (req, res) => {
+      if (!_App2.default.get("course")) return res.redirect("/courses");
+
+      const user = new (0, _User.User)(_App2.default.get("user"));
+      const {
+        name,
+        icon,
+        description,
+        university,
+        location,
+        status,
+        level,
+        type,
+        startedIn,
+        finishedIn,
+      } = req.body;
+
+      const course = new (0, _Course.Course)(_App2.default.get("course"));
+
+      if (name) course.setName(name);
+      if (icon) course.setIcon(icon);
+      if (description) course.setDescription(description);
+      if (university) course.setUniversity(university);
+      if (location) course.setLocation(location);
+      if (status) course.setStatus(status);
+      if (level) course.setLevel(level);
+      if (type) course.setType(type);
+      if (startedIn) course.setStartedIn(startedIn);
+      if (finishedIn) course.setFinishedIn(finishedIn);
+
+      const { data: newCourse, error: courseError } = await _connection.connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() });
+
+      if (courseError) return res.json({ error: courseError });
+
+      _App2.default.set("course", course);
+
+      return res.redirect("/course");
     });
 
     this.router.post('/register', async (req, res) => {
@@ -53,24 +110,34 @@ class CourseRoutes {
 
       if (courseError) return res.json({ error: courseError });
 
-      return res.redirect('/courses/course/' + course.getId());
+      _App2.default.set('course', course);
+
+      return res.redirect('/course');
     });
 
-    this.router.delete('/delete/:id', async (req, res) => {
-      const { id } = req.params;
-      const { data: courses, error: coursesError } = await _connection.connection.from('Courses').delete().match({ id });
-      return res.redirect('/courses');
-    });
+    this.router.get("/conclude", async (req, res) => {
+      const user = new (0, _User.User)(_App2.default.get("user"));
 
-    this.router.put('/edit/:id', async (req, res) => {
-      const { id } = req.params;
-      const { userId, name, icon, description, university, location, status, level, type, startedIn, finishedIn } = req.body;
-      const user = new (0, _User.User)(_App2.default.get('user'));
+      if (!_App2.default.get("course")) return res.redirect("/courses");
 
-      const { data: courses, error: coursesError } = await _connection.connection.from('Courses').update({ userId, name, icon, description, university, location, status, level, type, startedIn, finishedIn }).match({ id });
-      if (coursesError) return res.render('pages/courses', { title: 'Courses', user, courses, error: coursesError });
+      const course = new (0, _Course.Course)(_App2.default.get("course"));	
 
-      return res.redirect('/courses');
+      course.setStatus("Concluído");
+      course.setWorkloadAndCredits();
+
+      const { data, error } = await _connection.connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res
+          .status(400)
+          .json({ message: "Erro ao remover período", error });
+
+      _App2.default.set("course", data);
+
+      return res.redirect("/course/c/" + course.getId());
     });
   }
 }
