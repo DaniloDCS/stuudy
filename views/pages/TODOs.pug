@@ -1,0 +1,51 @@
+h3 Minhas tarefas
+
+button(data-btn-modal="new-todo") <i class="fas fa-plus"></i> Criar um novo TODO
+.modal.modal-md(data-modal="new-todo")
+  form.modal-content(action="/TODO/create" method="POST")
+    .modal-header
+      span(data-modal-close="new-todo") <i class="fas fa-times-circle"></i>
+      h3 Criar um novo TODO
+    .modal-body
+      .form-item 
+        label(for="title") <i class="fas fa-pen"></i> Título
+        input(type="text" name="title" id="title")
+      .form-item 
+        label(for="content") <i class="fas fa-align-left"></i> Descrição
+        textarea(type="text" name="content" id="content")
+      .form-item 
+        label(for="status") <i class="fas fa-check"></i> Status
+        select#status(name="status")
+          option(value="pending") Pendente
+          option(value="Concluído") Concluído
+      .form-item 
+        label(for="finishIn") <i class="fas fa-calendar-alt"></i> Concluir em
+        input(type="date" name="finishIn" id="finishIn")
+    .modal-footer
+      button.modal-btn-cancel(data-modal-close="new-todo" type="button") <i class="fas fa-times-circle"></i> Cancelar 
+      button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+
+table
+  tr 
+    th #
+    th Título
+    th Conteúdo
+    th Status
+    th Concluir em
+    th Ações
+  - cont = 1; 
+  if discipline.TODOs.length > 0
+    each todo, index in discipline.TODOs
+      tr 
+        th #{cont++}
+        td #{todo.title}
+        td #{todo.content}
+        td #{todo.status}
+        td #{todo.finishIn}
+        td 
+          a(href="/disciplines/discipline/" + discipline.id + "/todo/" + todo.id) Acessar
+          a(href="/TODO/delete/" + todo.id)  | Remover
+  else
+    tr
+      td(colspan="6") Nenhuma tarefa cadastrada
+

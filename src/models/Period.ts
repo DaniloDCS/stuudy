@@ -6,8 +6,8 @@ interface IPeriod {
   readonly id?: string;
   name: string;
   icon?: string;
-  credits: number;
-  workload: number;
+  credits?: number;
+  workload?: number;
   workloadCompleted?: number;
   progress?: number;
   status: string;
@@ -69,6 +69,7 @@ class Period implements IPeriod {
 
   public updateDiscipline(discipline: Discipline) {
     this.disciplines = this.disciplines.map(d => d.id === discipline.id ? discipline : d);
+    this.setWorkloadAndCredits();
   }
 
   public updatePeriod(period: Period) {
@@ -139,6 +140,8 @@ class Period implements IPeriod {
       let discipline = new Discipline(d);
       return acc + Number(discipline.getWorkloadCompleted());
     }, 0));
+
+    this.progress = Number(this.workloadCompleted / this.workload * 100);
   }
 
   public setCra = (cra: number): number => this.cra = cra

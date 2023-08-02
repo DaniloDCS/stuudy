@@ -1,0 +1,24 @@
+// infomações da disciplina
+h3 Informações da disciplina
+
+table
+  tr 
+    th Nome
+    td #{discipline.icon}| #{discipline.name}
+  tr 
+    th Professores
+    td 
+      each teacher in discipline.teachers
+        p #{teacher.name}
+  tr 
+    th Carga horária
+    td #{discipline.workload}
+  tr 
+    th Créditos
+    td #{discipline.credits}
+  tr 
+    th Código
+    td #{discipline.code}
+  tr 
+    th Situação
+    td #{discipline.status}

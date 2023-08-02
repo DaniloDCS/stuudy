@@ -1,6 +1,39 @@
 extends ../layout
 block content
+  style. 
+    #themes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+      list-style: none;
+    }
+
+    #themes .theme {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid #ccc;
+    }
+
+    #themes .theme.active {
+      border: 2px solid lime;
+    }
+
   h1 Meu perfil
+
+  - const themes = ["theme-blue", "theme-red", "theme-green", "theme-yellow", "theme-purple", "theme-white", "theme-gray", "theme-black", "theme-brown", "theme-orange", "theme-pink", "theme-cyan", "theme-indigo", "theme-teal", "theme-lime", "theme-amber"];
+  - let current = themes.indexOf(user.theme);
+  div
+    h2 Temas
+    #themes
+      each theme in themes
+        .theme(class=`circle-${theme} ${theme === user.theme ? 'active' : ''}`, data-theme=`${theme}`)
+
+
   div
     h2 Informações pessoais
     form(action="/me/update", method="post") 
@@ -35,3 +68,36 @@ block content
         input(type="password", name="new-password", required="required", id="new-password")
       div 
         button(type="submit") Atualizar senha
+
+
+  script. 
+    const dataThemes = document.querySelectorAll("[data-theme]");
+    const themeCurrent = document.querySelector("#theme-current");
+    
+    if (dataThemes.length){
+      dataThemes.forEach(dataTheme => {
+        dataTheme.addEventListener("click", () => {
+          const theme = dataTheme.dataset.theme;
+          fetch("/users/theme", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              theme
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status) {
+              dataThemes.forEach(dataTheme => {
+                dataTheme.classList.remove("active");
+                themeCurrent.classList.remove(dataTheme.dataset.theme);
+              });
+              dataTheme.classList.add("active");
+              themeCurrent.classList.add(theme);
+            }
+          });
+        });
+      });
+    }

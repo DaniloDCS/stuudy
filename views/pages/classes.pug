@@ -1,0 +1,418 @@
+style. 
+  .rich-text {
+    font-size: 1.5rem;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .rich-pages {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .rich-content {
+    padding: 2cm 2cm 2cm 2cm;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 804px;
+    height: 1241px;
+    min-width: 804px;
+    min-height: 1241px;
+    max-width: 804px;
+    max-height: 1241px;
+    overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    margin: 0 auto;
+    font: 500 12px Arial;
+  }
+
+  .rich-content * {
+    background-color: inherit;
+  }
+
+  .rich-text-menu {
+    display: flex;
+  }
+
+  .rich-text-menu input[type="color"]{
+    width: 160px !important;
+    height: 60px !important;
+    border: none !important;
+    cursor: pointer !important;
+  }
+
+  .rich-active {
+    background-color: #ccc !important;
+    color: #000 !important;
+  }
+
+  .rich-page-text {
+    width: 100%;
+    height: fit-content;
+    background-color: red;
+  }
+
+- let allClasses = [];
+
+h3 Minhas aulas
+
+button(data-btn-modal="new-class") <i class="fas fa-plus"></i> Criar uma nova aula
+.modal.modal-xl(data-modal="new-class")
+  form.modal-content(action="/class/create" method="POST")
+    .modal-header
+      span(data-modal-close="new-class") <i class="fas fa-times-circle"></i>
+      h3 Criar uma nova aula
+    .modal-body
+      .form-item   
+        label(for="title") <i class="fas fa-heading"></i> Título
+        input(type="text" name="title" id="title")
+      .d-flex.justify-center
+        .form-item.p-1.w-50 
+          label(for="unityId") <i class="fab fa-unity"></i> Unidade
+          select#unityId(name="unityId")
+            each unity in discipline.unities
+              option(value=unity.id) #{unity.title} 
+        .form-item.p-1.w-50  
+          label(for="date") <i class="fas fa-calendar-alt"></i> Data
+          input(type="date" name="date" id="date")
+      .d-flex.justify-center
+        .form-item.p-1.w-100    
+          label(for="quantity") <i class="fas fa-sort-numeric-up"></i> Quantidade de aulas
+          input(type="number" name="quantity" id="quantity", value="2")
+        .form-item.p-1.w-100   
+          label(for="type") <i class="fas fa-sort-numeric-up"></i> Tipo
+          input(type="text" name="type" id="type", value="Presencial")
+        .form-item.p-1.w-100    
+          label(for="IWasPresent") <i class="fas fa-sort-numeric-up"></i> Eu estava presente?
+          select#IWasPresent(name="IWasPresent")
+            option(value="true", selected) Sim
+            option(value="false") Não
+      .form-item   
+        label(for="content") <i class="fas fa-file-alt"></i> Conteúdo
+        textarea#content-class-value.d-none(name="content") 
+        //.class-content#class-content(contenteditable="true")
+        .rich-text#class-content(data-rich-text="rich-text-0")
+    .modal-footer
+      button.modal-btn-cancel(data-modal-close="new-class", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+      button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+
+button(data-btn-modal="new-unity") <i class="fas fa-plus"></i> Criar uma nova unidade
+.modal.modal-md(data-modal="new-unity")
+  .modal-content
+    .modal-header
+      span(data-modal-close="new-unity") <i class="fas fa-times-circle"></i>
+      h3 Criar uma nova unidade
+    .modal-body
+      p Você tem certeza que deseja criar uma nova unidade?
+    .modal-footer
+      button.modal-btn-cancel(data-modal-close="new-unity", type="button") <i class="fas fa-times-circle"></i> Não, cancelar 
+      a.modal-btn-ok(href="/unity/new") <i class="fas fa-check-circle"></i> Sim, criar
+
+table 
+  tr 
+    th #
+    th Data
+    th Quantidade
+    th Estava presente
+    th Título
+    th Ações
+  - let cont = 1; 
+  each unity, index in discipline.unities
+    tr 
+      if index > 1
+        th  
+          button(data-btn-modal="delete-unity") <i class="fas fa-trash-alt"></i> Excluir unidade
+          .modal.modal-md(data-modal="delete-unity")
+            .modal-content
+              .modal-header
+                span(data-modal-close="delete-unity") <i class="fas fa-times-circle"></i>
+                h3 Você tem certeza disso?
+              .modal-body
+                p Você tem certeza que deseja excluir está unidade <strong> #{unity.title.toUpperCase()} </strong>? A ação não poderá ser desfeita e as aulas serão excluídas.
+              .modal-footer
+                button.modal-btn-cancel(data-modal-close="delete-unity", type="button") <i class="fas fa-times-circle"></i> Não, cancelar 
+                a.modal-btn-ok(href="/unity/delete/" + unity.id) <i class="fas fa-check-circle"></i> Sim, excluir
+        th(colspan="6") #{unity.title} 
+      else 
+        th(colspan="6") #{unity.title} 
+    if !unity.classes.length > 0
+      tr 
+        td(colspan="6") Não há aulas cadastradas para esta unidade
+    else 
+      - allClasses.push(...unity.classes)
+      each _class, index2 in unity.classes
+        tr 
+          th #{cont++}
+          td #{new Date(_class.date).toLocaleDateString('pt-BR', { month: 'long', day: 'numeric', year: 'numeric' })}
+          td #{_class.quantity}
+          td #{_class.IWasPresent ? "Sim" : "Não"}
+          td #{_class.title}
+          td(contenteditable="true", data-classedit="class-" + cont, data-classedit-dados={ classId: _class.id, disciplineId: discipline.id, unityId: unity.id  }) !{_class.content}
+          td 
+            button(data-btn-carousel="carousel", data-carousel-index=cont) Visualizar aula
+
+            button(data-btn-modal="edit-class-" + cont) Editar aula
+            .modal.modal-md(data-modal="edit-class-" + cont)
+              form.modal-content(action="/class/update/" + _class.id, method="POST")
+                input(type="hidden" name="oldUnityId" value=unity.id)
+                .modal-header
+                  span(data-modal-close="edit-class-" + cont) <i class="fas fa-times-circle"></i>
+                  h3 Editar aula: #{_class.title}
+                .modal-body
+                  div 
+                    div   
+                      label(for="unityId") unityId
+                      select#unityId(name="unityId")
+                        each u in discipline.unities
+                          option(value=u.id selected=u.id === unity.id) #{u.title}
+                  div 
+                    label(for="title") Título
+                    input(type="text" name="title" id="title", value=_class.title)
+                  div 
+                    label(for="content") Conteúdo
+                    textarea(name="content" id="content", cols="30", rows="10") #{_class.content}
+                  div   
+                    label(for="date") Data
+                    input(type="date" name="date" id="date", value=new Date(_class.date).toISOString().slice(0,10))
+                  div   
+                    label(for="quantity") Quantidade
+                    input(type="number" name="quantity" id="quantity", value=_class.quantity)
+                  div   
+                    label(for="IWasPresent") Estava presente
+                    select(name="IWasPresent" id="IWasPresent")
+                      option(value="true" selected=_class.IWasPresent) Sim
+                      option(value="false" selected=!_class.IWasPresent) Não
+                .modal-footer
+                  button.modal-btn-cancel(data-modal-close="edit-class-" + cont, type="button") <i class="fas fa-times-circle"></i> Cancelar 
+                  button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+
+            button(data-btn-modal="delete-class-" + cont) Excluir aula
+            .modal.modal-md(data-modal="delete-class-" + cont)
+              .modal-content
+                .modal-header
+                  span(data-modal-close="delete-class-" + cont) <i class="fas fa-times-circle"></i>
+                  h3 Você tem certeza disso?
+                .modal-body
+                  p Você tem certeza que deseja excluir a aula #{_class.title}?
+                .modal-footer
+                  button.modal-btn-cancel(data-modal-close="delete-class-" + cont, type="button") <i class="fas fa-times-circle"></i> Não, cancelar 
+                  a.modal-btn-ok(href="/class/delete/" + _class.id) <i class="fas fa-check-circle"></i> Sim, excluir
+     
+
+if (allClasses.length > 2)
+  .carousel(data-carousel="carousel")
+    .carousel-inner
+      .carousel-item-left(data-index="0")
+        .carousel-item-content
+          | !{allClasses[allClasses.length - 1].content}
+      .carousel-item-center(data-index="1")
+        .carousel-item-content
+          | !{allClasses[0].content}
+        .carousel-buttons
+          button(data-btn-prev-index=allClasses.length - 1)#preview-prev-class.carousel-button-left Aula anterior
+          span(style="flex: 1; text-align: center;")#preview-class-number Aula 1 de #{allClasses.length}
+          button(data-btn-next-index=1)#preview-next-class.carousel-button-right Próxima aula
+          button(data-btn-modal="download-class") <i class="fas fa-download"></i>
+          .modal.modal-md(data-modal="download-class")
+            .modal-content
+              .modal-header
+                span(data-modal-close="download-class") <i class="fas fa-times-circle"></i>
+                h3 Baixar aula
+              .modal-body
+                  button#download-class-pdf Baixar em PDF <i class="fas fa-file-pdf"></i>
+                  button#download-class-docx  Baixar em DOCX <i class="fas fa-file-word"></i>
+                  button#download-class-txt Baixar em TXT <i class="fas fa-file-alt"></i>
+                  button#download-class-html  Baixar em HTML <i class="fas fa-file-code"></i>
+              .modal-footer
+                button.modal-btn-cancel(data-modal-close="download-class", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+                
+          button(data-btn-carousel-close="carousel") <i class="fas fa-times-circle"></i> 
+      .carousel-item-right(data-index="2")
+        .carousel-item-content
+          | !{allClasses[1].content}
+
+
+script. 
+  document.querySelector("#class-content").addEventListener("keyup", (e) => {
+    document.querySelector("#content-class-value").value = document.querySelector("#class-content").querySelector("[data-rich-content]").innerHTML;
+    document.querySelector("#content-class-value").innerText = document.querySelector("#class-content").querySelector("[data-rich-content]").innerHTML;
+  })
+
+  const allClasses = !{JSON.stringify(allClasses)};
+
+  if (allClasses.length > 2){
+    const btnPreviewPrevClass = document.querySelector('#preview-prev-class');
+    const btnPreviewNextClass = document.querySelector('#preview-next-class');
+
+    const carouselItemLeft = document.querySelector('.carousel-item-left');
+    const carouselItemCenter = document.querySelector('.carousel-item-center');
+    const carouselItemRight = document.querySelector('.carousel-item-right');
+
+    const previewClassNumber = document.querySelector('#preview-class-number');
+
+    const btnDownloadPdf = document.querySelector('#download-class-pdf');
+    const btnDownloadDocx = document.querySelector('#download-class-docx');
+    const btnDownloadTxt = document.querySelector('#download-class-txt');
+    const btnDownloadHtml = document.querySelector('#download-class-html');
+
+    function updatesBtnsDownloads(index){
+      btnDownloadPdf.onclick = () => downloadClass('application/pdf', allClasses[index].content, 'pdf', index);
+      btnDownloadDocx.onclick = () => downloadClass('application/vnd.openxmlformats-officedocument.wordprocessingml.document', allClasses[index].content, 'docx', index);
+      btnDownloadTxt.onclick = () => downloadClass('text/plain', allClasses[index].content, 'txt', index);
+      btnDownloadHtml.onclick = () => downloadClass('text/html', allClasses[index].content, 'html', index);
+    }
+
+    updatesBtnsDownloads(0);
+
+    btnPreviewPrevClass.addEventListener('click', (e) => {
+      const index = Number(btnPreviewPrevClass.dataset.btnPrevIndex);
+      previewClassNumber.innerHTML = `Aula ${index + 1} de ${allClasses.length}`;
+
+      let currentIndex = index,
+          prevIndex = index - 1 < 0 ? allClasses.length - 1 : index - 1,
+          nextIndex = index + 1 > allClasses.length - 1 ? 0 : index + 1;
+            
+      carouselItemCenter.querySelector('.carousel-item-content').innerHTML = allClasses[currentIndex].content;
+      carouselItemLeft.querySelector('.carousel-item-content').innerHTML = allClasses[prevIndex].content;
+      carouselItemRight.querySelector('.carousel-item-content').innerHTML = allClasses[nextIndex].content;
+
+      btnPreviewPrevClass.dataset.btnPrevIndex = prevIndex;
+      btnPreviewNextClass.dataset.btnNextIndex = nextIndex;
+
+      updatesBtnsDownloads(index);
+    });
+
+    btnPreviewNextClass.addEventListener('click', (e) => {
+      const index = Number(btnPreviewNextClass.dataset.btnNextIndex);
+      previewClassNumber.innerHTML = `Aula ${index + 1} de ${allClasses.length}`;
+
+      let currentIndex = index,
+          prevIndex = index == 0 ? allClasses.length - 1 : index - 1,
+          nextIndex = index == allClasses.length - 1 ? 0 : index + 1;
+
+      carouselItemCenter.querySelector('.carousel-item-content').innerHTML = allClasses[currentIndex].content;
+      carouselItemLeft.querySelector('.carousel-item-content').innerHTML = allClasses[prevIndex].content;
+      carouselItemRight.querySelector('.carousel-item-content').innerHTML = allClasses[nextIndex].content;
+
+      btnPreviewNextClass.dataset.btnNextIndex = nextIndex;
+      btnPreviewPrevClass.dataset.btnPrevIndex = prevIndex;
+
+      updatesBtnsDownloads(index);
+    });
+
+    const btnsCarousel = document.querySelectorAll('[data-btn-carousel]');
+    const carousels = document.querySelectorAll('[data-carousel]');
+
+    btnsCarousel.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const carouselId = btn.dataset.btnCarousel;
+        const carouselIndex = Number(btn.dataset.carouselIndex) - 2;
+
+        previewClassNumber.innerHTML = `Aula ${carouselIndex + 1} de ${allClasses.length}`;
+
+        const carousel = document.querySelector(`[data-carousel="${carouselId}"]`);
+        if (carousel) carousel.classList.add('show');
+
+        let currentIndex = carouselIndex,
+          prevIndex = carouselIndex - 1 < 0 ? allClasses.length - 1 : carouselIndex - 1,
+          nextIndex = carouselIndex + 1 > allClasses.length - 1 ? 0 : carouselIndex + 1;
+
+        carouselItemCenter.querySelector('.carousel-item-content').innerHTML = allClasses[currentIndex].content;
+        carouselItemLeft.querySelector('.carousel-item-content').innerHTML = allClasses[prevIndex].content;
+        carouselItemRight.querySelector('.carousel-item-content').innerHTML = allClasses[nextIndex].content;
+
+        btnPreviewNextClass.dataset.btnNextIndex = nextIndex; 
+        btnPreviewPrevClass.dataset.btnPrevIndex = prevIndex;
+
+        updatesBtnsDownloads(carouselIndex);
+      });
+    });
+
+    function downloadClass(type, content, ext, index){
+      const file = new Blob([content], {type: type, encoding: 'UTF-8'});
+
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(file);
+      a.download = `aula-${index + 1}.${ext}`;
+      a.click();
+    }
+
+    const btnsCarouselClose = document.querySelectorAll('[data-btn-carousel-close]');
+    btnsCarouselClose.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const carouselId = btn.dataset.btnCarouselClose;
+        const carousel = document.querySelector(`[data-carousel="${carouselId}"]`);
+        carousel.classList.remove('show');
+      });
+    });
+  }
+
+  const classedits = document.querySelectorAll('[data-classedit]');
+  classedits.forEach(classedit => {
+    let timer = null;
+
+    classedit.addEventListener('keyup', (e) => {
+      clearTimeout(timer);
+
+      timer = setTimeout(() => {
+
+        const dados = JSON.parse(classedit.getAttribute('data-classedit-dados'));
+
+        fetch('/class/editing', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            classId: dados.classId,
+            disciplineId: dados.disciplineId,
+            unityId: dados.unityId,
+            content: classedit.innerHTML
+          })
+        })
+          .then(res => res.json())
+          .then(res => {
+            console.log("As alterações foram salvas com sucesso!");
+
+            const msg = document.createElement('span');
+            msg.style = `
+              background-color: #2ecc71;
+              border: 1px solid #ccc;
+              padding: 10px;
+              border-radius: 20px;
+              box-shadow: 0px 0px 5px #ccc;
+              color: white;
+              font-size: 16px;
+              margin-left: 10px;
+              font-weight: bold;
+              z-index: 9999;
+              animation: msg 3s ease-in-out;
+            `;
+
+            if (res.message == "Atualizado com sucesso") msg.innerHTML = "<i class='fas fa-check-circle'></i> As alterações foram salvas com sucesso!";
+            else {
+              msg.style.backgroundColor = "#e74c3c";
+              msg.innerHTML = "<i class='fas fa-times-circle'></i> Ocorreu um erro ao salvar as alterações!";
+            }
+            
+            document.querySelector(".discipline-title").appendChild(msg);
+
+            setTimeout(() => {
+              msg.remove();
+            }, 4000);
+
+          });
+
+      }, 3000);
+    });
+  });

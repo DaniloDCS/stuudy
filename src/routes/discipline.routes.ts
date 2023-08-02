@@ -1,12 +1,43 @@
-import { Router, Request, Response } from 'express';
-import App from '../App';
-import { connection } from '../database/connection';
-import { Course } from '../models/Course';
-import { Period } from '../models/Period';
-import { Discipline } from '../models/Discipline';
-import { User } from '../models/User';
+import App from "../App";
 
-import { Unity, Class, Bulletin, Evaluation, Question, Work, Activity, Resume, Media, TODOs } from '../models/Discipline';
+import { Router, Request, Response } from "express";
+import { connection } from "../database/connection";
+
+import { User } from "../models/User";
+import { Course } from "../models/Course";
+import { Period } from "../models/Period";
+import { Discipline, Teacher } from "../models/Discipline";
+
+function capitalizeFirstLetter(string: string) {
+  if (!string) return "";
+
+  return string
+    .toLowerCase()
+    .trim()
+    .split(" ")
+    .map((word) => {
+      if (
+        word === "de" ||
+        word === "da" ||
+        word === "do" ||
+        word === "dos" ||
+        word === "das" ||
+        word === "e" ||
+        word === "em"
+      )
+        return word;
+      if (
+        word === "i" ||
+        word === "ii" ||
+        word === "iii" ||
+        word === "iv" ||
+        word === "v"
+      )
+        return word.toUpperCase();
+      return word[0].toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+}
 
 class DisciplineRoutes {
   public router: Router;
@@ -17,173 +48,201 @@ class DisciplineRoutes {
   }
 
   private routes(): void {
+    this.router.get("/d/:id", async (req: Request, res: Response) => {
+      const { id } = req.params,
+        user = new User(App.get("user"));
 
-    this.router.get('/discipline/:id', async (req: Request, res: Response) => {
-      const { id } = req.params;
-      const user = new User(App.get('user'));
+      if (!App.get("course")) return res.redirect("/courses");
+      if (!App.get("period")) return res.redirect("/course");
 
-      const course = new Course(App.get('course'));
-      const period = new Period(App.get('period'));
-      const discipline = new Discipline(period.getDiscipline(id));
+      const course = new Course(App.get("course")),
+        period = new Period(App.get("period")),
+        discipline = new Discipline(period.getDiscipline(id));
 
-      App.set('discipline', discipline);
+      if (!discipline) return res.redirect("/period");
 
-      return res.render('pages/discipline', { title: discipline.getName(), user, course, period, discipline });
+      App.set("discipline", discipline);
+
+      return res.redirect("/discipline");
     });
 
-    this.router.post('/discipline/register', async (req: Request, res: Response) => {
-      const { id } = req.params;
+    this.router.get("/", async (req: Request, res: Response) => {
+      const user = new User(App.get("user"));
+
+      if (!App.get("course")) return res.redirect("/courses");
+      if (!App.get("period")) return res.redirect("/course");
+      if (!App.get("discipline")) return res.redirect("/period");
+
+      const course = new Course(App.get("course")),
+        period = new Period(App.get("period")),
+        discipline = new Discipline(App.get("discipline"));
+
+      return res.render("pages/discipline", {
+        title: discipline.getName(),
+        user,
+        course,
+        period,
+        discipline,
+      });
+    });
+
+    this.router.get("/conclude", async (req: Request, res: Response) => {
+      if (!App.get("course")) return res.redirect("/courses");
+      if (!App.get("period")) return res.redirect("/course");
+      if (!App.get("discipline")) return res.redirect("/period");
+
+      const user = new User(App.get("user")),
+        course = new Course(App.get("course")),
+        period = new Period(App.get("period")),
+        discipline = new Discipline(App.get("discipline"));
+
+      if (discipline.getMedia() >= 7 && discipline.getMedia() <= 10)
+        discipline.setStatus("Aprovado");
+      else discipline.setStatus("Reprovado");
+
+      period.updateDiscipline(discipline);
+      course.updatePeriod(period);
+      course.setWorkloadAndCredits();
+
+      const { data, error } = await connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res.status(400).json({ message: "Erro ao cadastrar", error });
+
+      App.set("course", course);
+      App.set("period", period);
+      App.set("discipline", discipline);
+
+      return res.redirect("/discipline/d/" + discipline.getId());
+    });
+
+    this.router.post("/update", async (req: Request, res: Response) => {
       const { name, icon, code, credits, workload, teachers } = req.body;
 
-      function capitalizeFirstLetter(string: string) {
-        return string.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-      }
+      if (!name || !code || !credits || !workload)
+        return res.status(400).json({ message: "Dados inválidos" });
+      if (!App.get("course")) return res.redirect("/courses");
+      if (!App.get("period")) return res.redirect("/course");
+      if (!App.get("discipline")) return res.redirect("/period");
 
-      const user = new User(App.get('user'));
-      const course = new Course(App.get('course'));
-      let period = new Period(App.get('period'));
+      const user = new User(App.get("user")),
+        course = new Course(App.get("course")),
+        period = new Period(App.get("period")),
+        discipline = new Discipline(App.get("discipline"));
 
+      if (name) discipline.setName(capitalizeFirstLetter(name));
+      if (icon) discipline.setIcon(icon);
+      if (code) discipline.setCode(code);
+      if (credits) discipline.setCredits(credits);
+      if (workload) discipline.setWorkload(workload);
+      if (teachers)
+        discipline.setTeachers(
+          teachers.map(
+            (teacher: string) =>
+              new Teacher({ name: capitalizeFirstLetter(teacher) })
+          )
+        );
+
+      period.updateDiscipline(discipline);
+      course.updatePeriod(period);
+      course.setWorkloadAndCredits();
+
+      const { data, error } = await connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res
+          .status(400)
+          .json({ message: "Erro ao atualizar disciplina", error });
+
+      App.set("course", course);
+      App.set("period", period);
+      App.set("discipline", discipline);
+
+      return res.redirect("/discipline/d/" + discipline.getId());
+    });
+
+    this.router.post("/register", async (req: Request, res: Response) => {
+      const { name, icon, code, credits, workload, teachers } = req.body;
+
+      if (!name || !code || !credits || !workload)
+        return res.status(400).json({ message: "Dados inválidos" });
+
+      if (!App.get("course")) return res.redirect("/courses");
+      if (!App.get("period")) return res.redirect("/course");
+
+      const user = new User(App.get("user")),
+        course = new Course(App.get("course")),
+        period = new Period(App.get("period"));
       const discipline = new Discipline({
-        name: capitalizeFirstLetter(name), 
-        icon, code, credits, workload, 
-        teachers: teachers.map((teacher: string) => capitalizeFirstLetter(teacher)),
-        periodId: period.getId()
+        name: capitalizeFirstLetter(name),
+        icon,
+        code,
+        credits,
+        workload,
+        teachers: teachers.map(
+          (teacher: string) =>
+            new Teacher({ name: capitalizeFirstLetter(teacher) })
+        ),
+        periodId: period.getId(),
       });
 
-      course.setDiscipline(discipline);
-      period = new Period(course.getPeriod(period.getId()) || period);
+      period.setDiscipline(discipline);
+      course.updatePeriod(period);
+      course.setWorkloadAndCredits();
 
-      const { data, error } = await connection.from('Courses').update(course).match({ id: course.getId(), userId: user.getId() }).single();
-      if (error) return res.status(400).json({ message: 'Erro ao cadastrar disciplina', error });
+      const { data, error } = await connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res
+          .status(400)
+          .json({ message: "Erro ao cadastrar disciplina", error });
 
-      App.set('course', course);
-      App.set('period', period);
+      App.set("course", course);
+      App.set("period", period);
+      App.set("discipline", discipline);
 
-      return res.redirect(`/disciplines/discipline/${discipline.getId()}`);
+      return res.redirect("/discipline/d/" + discipline.getId());
     });
 
-    this.router.post('/discipline/:id/update', async (req: Request, res: Response) => {
-      const { id } = req.params;
-      const { disciplineId, name, icon, code, credits, workload, teachers } = req.body;
-      const user = new User(App.get('user'));
-      const course = new Course(App.get('course'));
-
-      let period = new Period(course.getPeriod(id) || App.get('period'));
-      const discipline = new Discipline({ id: disciplineId, name, icon, code, credits, workload, teachers, periodId: period.getId() });
-
-      course.updateDiscipline(discipline);
-      period = new Period(course.getPeriod(id) || App.get('period'));
-
-      const { data, error } = await connection.from('Courses').update(course).match({ id: course.getId(), userId: user.getId() }).single();
-      if (error) return res.status(400).json({ message: 'Erro ao atualizar disciplina', error });
-
-      App.set('course', course);
-      App.set('period', period);
-
-      return res.redirect(`/disciplines/discipline/${discipline.getId()}`);
-    });
-
-    this.router.get('/discipline/:id/:periodId/delete', async (req: Request, res: Response) => {
-      const { id, periodId } = req.params;
-      const user = new User(App.get('user'));
-      const course = new Course(App.get('course'));
-
-      course.deleteDiscipline(id, periodId);
-
-      let period = new Period(course.getPeriod(App.get('period').id) || App.get('period'));
-
-      const { data, error } = await connection.from('Courses').update(course).match({ id: course.getId(), userId: user.getId() }).single();
-      if (error) return res.status(400).json({ message: 'Erro ao deletar disciplina', error });
-
-      App.set('course', data);
-      App.set('period', period);
-
-      return res.redirect(`/periods/period/${period.getId()}`);
-    });
-
-    this.router.post('/discipline/:option/register', async (req: Request, res: Response) => {
-      const { option } = req.params;
-      const user = new User(App.get('user'));
-      const course = new Course(App.get('course'));
-      const period = new Period(App.get('period'));
-      const discipline = new Discipline(App.get('discipline'));
-
-      if (!course || !period || !discipline) return res.status(400).json({ message: 'Erro ao cadastrar' });
-
-      if (option === 'class') {
-        const { title, description, content, quantity, date, IWasPresent, type, unityId } = req.body;
-        const _class = new Class({ title, description, content, quantity, date, IWasPresent, type });
-        discipline.setClass(unityId, _class);
-      } else if (option === 'evaluation') {
-        const { title, description, questions, note, bulletinId } = req.body;
-        const evaluation = new Evaluation({ title, description, questions, note, bulletinId });
-        discipline.setEvaluations(evaluation);
-      } else if (option === 'activity') {
-        const { title, description, questions, bulletinId } = req.body;
-        const activity = new Activity({ title, description, questions });
-        discipline.setActivities(activity);
-      } else if (option === 'bulletin') {
-        const { title, value, weight, type } = req.body;
-        const bulletin = new Bulletin({ title, value, weight, type });
-        discipline.setBulletins(bulletin);
-      } else if (option === 'media') {
-        const { title, link, type } = req.body;
-        const media = new Media({ title, link, type });
-        discipline.setMedias(media);
-      } else if (option === 'work') {
-        const { title, content, note, bulletinId } = req.body;
-        const work = new Work({ title, content, note, bulletinId });
-        discipline.setWorkers(work);
-      } else if (option === 'resume') {
-        const { title, content } = req.body;
-        const resume = new Resume({ title, content });
-        discipline.setResumes(resume);
-      } else if (option === 'todo') {
-        const { title, content, status } = req.body;
-        const todo = new TODOs({ title, content, status });
-        discipline.setTODOs(todo);
-      } else if (option === 'unity') {
-        const { title } = req.body;
-        const unity = new Unity({ title });
-        discipline.setUnities(unity);
-      } else {
-        return res.status(400).json({ message: 'Opção inválida' });
-      }
-
-      course.updateDiscipline(discipline);
-      const { data, error } = await connection.from('Courses').update(course).match({ id: course.getId(), userId: user.getId() }).single();
-      if (error) return res.status(400).json({ message: 'Erro ao cadastrar', error });
-
-      App.set('course', course);
-      App.set('period', period);
-      App.set('discipline', discipline);
-
-      return res.redirect(`/disciplines/discipline/${discipline.getId()}`);
-    });
-
-    this.router.post('/bulletins/update', async (req: Request, res: Response) => {
-      const notes = req.body;
-      const user = new User(App.get('user'));
-      const course = new Course(App.get('course'));
-      const period = new Period(App.get('period'));
-      let discipline = new Discipline(App.get('discipline'));
-
-      const bulletins = Object.keys(notes).map((note: any) => {
-        let bulletin = notes[note];
-        return new Bulletin({ title: bulletin.title, value: bulletin.value, weight: bulletin.weight, type: bulletin.type });
-      });
-
-      discipline = discipline.updateBulletins(bulletins);
-      course.updateDiscipline(discipline);
+    this.router.get("/delete", async (req: Request, res: Response) => {
+      if (!App.get("course")) return res.redirect("/courses");
+      if (!App.get("period")) return res.redirect("/course");
+      if (!App.get("discipline")) return res.redirect("/period");
       
-      const { data, error } = await connection.from('Courses').update(course).match({ id: course.getId(), userId: user.getId() }).single();
-      if (error) return res.status(400).json({ message: 'Erro ao atualizar', error });
+      
+      const user = new User(App.get("user")),
+        course = new Course(App.get("course")),
+        period = new Period(App.get("period")),
+        discipline = new Discipline(App.get("discipline"));
 
-      App.set('course', course);
-      App.set('period', period);
-      App.set('discipline', discipline);
+      period.deleteDiscipline(discipline.getId());
+      course.updatePeriod(period);
+      course.setWorkloadAndCredits();
 
-      return res.redirect(`/disciplines/discipline/${discipline.getId()}`);
+      const { data, error } = await connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res
+          .status(400)
+          .json({ message: "Erro ao deletar disciplina", error });
+
+      App.set("course", data);
+      App.set("period", period);
+      App.set("discipline", null);
+
+      return res.redirect("/period/p/" + period.getId());
     });
   }
 }

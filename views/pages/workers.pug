@@ -1,0 +1,45 @@
+h3 Meus trabalhos
+table
+  tr 
+    th #
+    th Título
+    th Link
+    th Ações
+  - cont = 1; 
+  if discipline.workers.length > 0
+    each work, index in discipline.workers
+      tr 
+        th #{cont++}
+        td #{work.title}
+        td #{work.link}
+        td 
+          a(href="/disciplines/discipline/" + discipline.id + "/work/" + work.id) Acessar
+          a(href="/disciplines/discipline/" + discipline.id + "/work/" + work.id + "/delete")  | Remover
+  else
+    tr
+      td(colspan="4") Nenhum trabalho cadastrado
+  
+br
+br
+
+h3 Registrar um novo trabalho
+form(action="/disciplines/discipline/work/register" method="POST")
+  div
+    label(for="title") Título
+    input(type="text" name="title" id="title")
+  div
+    label(for="content") Conteúdo
+    input(type="text" name="content" id="content")
+  div
+    label(for="link") Link
+    input(type="text" name="link" id="link")
+  div
+    label(for="note") Nota
+    input(type="number" name="note" id="note")
+  div
+    label(for="unity") Unidade
+    select(name="unity" id="unity")
+      each unity, index in discipline.unities
+        option(value=unity.id) #{unity.title}
+  div 
+    button(type="submit") Cadastrar

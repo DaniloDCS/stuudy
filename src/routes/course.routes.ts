@@ -13,19 +13,7 @@ class CourseRoutes {
   }
 
   private routes(): void {
-    this.router.get('/', async (req: Request, res: Response) => {
-      const user = new User(App.get('user'));
-
-      const { data: courses, error } = await connection.from('Courses').select('*').match({ userId: user.getId() });
-
-      return res.render('pages/courses', {
-        title: 'Cursos',
-        user,
-        courses
-      });
-    });
-
-    this.router.get('/course/:id', async (req: Request, res: Response) => {
+    this.router.get('/c/:id', async (req: Request, res: Response) => {
       const user = new User(App.get('user'));
       const { id } = req.params;
 
@@ -35,11 +23,80 @@ class CourseRoutes {
       const course = new Course(courses[0]);
       App.set('course', course);
 
-      return res.render('pages/course', {
+      return res.redirect('/course');
+    });
+
+    this.router.get("/", async (req: Request, res: Response) => {
+      if (!App.get("course")) return res.redirect("/courses");
+
+      const user = new User(App.get("user"));
+      const course = new Course(App.get("course"));
+
+      return res.render("pages/course", {
         title: course.getName(),
         user,
-        course
+        course,
       });
+    });
+
+    this.router.get("/delete/", async (req: Request, res: Response) => {
+      if (!App.get("course")) return res.redirect("/courses");
+
+      const user = new User(App.get("user"));
+      const course = new Course(App.get("course"));
+
+      const { data, error } = await connection
+        .from("Courses")
+        .delete()
+        .match({ id: course.getId(), userId: user.getId() });
+        
+      if (error) return res.json({ error });
+
+      App.set("course", null);
+
+      return res.redirect("/courses");
+    });
+
+    this.router.post("/update", async (req: Request, res: Response) => {
+      if (!App.get("course")) return res.redirect("/courses");
+
+      const user = new User(App.get("user"));
+      const {
+        name,
+        icon,
+        description,
+        university,
+        location,
+        status,
+        level,
+        type,
+        startedIn,
+        finishedIn,
+      } = req.body;
+
+      const course = new Course(App.get("course"));
+
+      if (name) course.setName(name);
+      if (icon) course.setIcon(icon);
+      if (description) course.setDescription(description);
+      if (university) course.setUniversity(university);
+      if (location) course.setLocation(location);
+      if (status) course.setStatus(status);
+      if (level) course.setLevel(level);
+      if (type) course.setType(type);
+      if (startedIn) course.setStartedIn(startedIn);
+      if (finishedIn) course.setFinishedIn(finishedIn);
+
+      const { data: newCourse, error: courseError } = await connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() });
+
+      if (courseError) return res.json({ error: courseError });
+
+      App.set("course", course);
+
+      return res.redirect("/course");
     });
 
     this.router.post('/register', async (req: Request, res: Response) => {
@@ -53,24 +110,34 @@ class CourseRoutes {
 
       if (courseError) return res.json({ error: courseError });
 
-      return res.redirect('/courses/course/' + course.getId());
+      App.set('course', course);
+
+      return res.redirect('/course');
     });
 
-    this.router.delete('/delete/:id', async (req: Request, res: Response) => {
-      const { id } = req.params;
-      const { data: courses, error: coursesError } = await connection.from('Courses').delete().match({ id });
-      return res.redirect('/courses');
-    });
+    this.router.get("/conclude", async (req: Request, res: Response) => {
+      const user = new User(App.get("user"));
 
-    this.router.put('/edit/:id', async (req: Request, res: Response) => {
-      const { id } = req.params;
-      const { userId, name, icon, description, university, location, status, level, type, startedIn, finishedIn }: ICourse = req.body;
-      const user = new User(App.get('user'));
+      if (!App.get("course")) return res.redirect("/courses");
 
-      const { data: courses, error: coursesError } = await connection.from('Courses').update({ userId, name, icon, description, university, location, status, level, type, startedIn, finishedIn }).match({ id });
-      if (coursesError) return res.render('pages/courses', { title: 'Courses', user, courses, error: coursesError });
+      const course = new Course(App.get("course"));	
 
-      return res.redirect('/courses');
+      course.setStatus("Concluído");
+      course.setWorkloadAndCredits();
+
+      const { data, error } = await connection
+        .from("Courses")
+        .update(course)
+        .match({ id: course.getId(), userId: user.getId() })
+        .single();
+      if (error)
+        return res
+          .status(400)
+          .json({ message: "Erro ao remover período", error });
+
+      App.set("course", data);
+
+      return res.redirect("/course/c/" + course.getId());
     });
   }
 }

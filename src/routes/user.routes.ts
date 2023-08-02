@@ -39,6 +39,20 @@ class UserRoutes {
 
       return res.status(200).json({ message: 'Notificação atualizada com sucesso', status: 'success' });
     });
+
+    this.router.put('/theme', async (req: Request, res: Response) => {
+      const { theme } = req.body;
+      const user = new User(App.get("user"));
+
+      user.setTheme(theme);
+
+      const { error } = await connection.from("Users").update(user).match({ id: user.getId() });
+      if (error) return res.status(500).json({ message: 'Erro ao atualizar tema', error });
+
+      App.set('user', user);
+
+      return res.status(200).json({ message: 'Tema atualizado com sucesso', status: 'success' });
+    });
   }
 
 }

@@ -1,0 +1,50 @@
+h3 Meus lembretes
+
+button(data-btn-modal="new-reminder") <i class="fas fa-plus"></i> Criar um novo lembrete
+.modal.modal-md(data-modal="new-reminder")
+  form.modal-content(action="/reminder/register" method="POST")
+    .modal-header
+      span(data-modal-close="new-reminder") <i class="fas fa-times-circle"></i>
+      h3 Criar um novo lembrete
+    .modal-body
+      div 
+        label(for="title") Título
+        input(type="text" name="title" id="title")
+      div
+        label(for="content") Conteúdo
+        input(type="text" name="content" id="content")
+      div 
+        label(for="status") Staus
+        select#status(name="status")
+          option(value="pending") Pendente
+          option(value="Concluído") Concluído
+      div 
+        label(for="concludedAt") Concluído em
+        input(type="datatime" name="concludedAt" id="concludedAt")
+    .modal-footer
+      button.modal-btn-cancel(data-modal-close="new-reminder", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+      button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+
+table
+  tr 
+    th #
+    th Título
+    th Conteúdo
+    th Status
+    th Concluído em
+    th Ações
+  - cont = 1; 
+  if discipline.reminders.length > 0
+    each reminder, index in discipline.reminders
+      tr 
+        th #{cont++}
+        td #{reminder.title}
+        td #{reminder.content}
+        td #{reminder.status}
+        td #{reminder.concludedAt}
+        td 
+          a(href="/disciplines/discipline/" + discipline.id + "/reminder/" + reminder.id) Acessar
+          a(href="/disciplines/discipline/" + discipline.id + "/reminder/" + reminder.id + "/delete")  | Remover
+  else
+    tr
+      td(colspan="6") Nenhum lembrete cadastrado

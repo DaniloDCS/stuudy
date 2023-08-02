@@ -1,0 +1,489 @@
+//extends ../layout
+//block content
+style.
+  .rich-text {
+    font-size: 1.5rem;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .rich-pages {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .rich-content {
+    padding: 2cm 2cm 2cm 2cm;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 804px;
+    height: 1241px;
+    min-width: 804px;
+    min-height: 1241px;
+    max-width: 804px;
+    max-height: 1241px;
+    overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    margin: auto;
+    font: 500 12px Arial;
+  }
+
+  .rich-content * {
+    background-color: inherit;
+  }
+
+  .rich-text-menu {
+    display: flex;
+  }
+
+  .rich-text-menu input[type="color"]{
+    width: 160px !important;
+    height: 60px !important;
+    border: none !important;
+    cursor: pointer !important;
+  }
+
+  .rich-active {
+    background-color: #ccc !important;
+    color: #000 !important;
+  }
+
+  .rich-page-text {
+    width: 100%;
+    height: fit-content;
+    background-color: red;
+  }
+
+div.rich-text(data-rich-text="rich-text-0")
+
+div.rich-text(data-rich-text="rich-text-1")
+  //- .rich-text-menu(data-rich-menu="rich-text-1")
+  //-   select.rich-text-font-style(data-rich-font-style="rich-text-1")
+  //-     option(value="normal") Texto normal
+  //-     option(value="h1") Título 1
+  //-     option(value="h2") Título 2
+  //-     option(value="h3") Título 3
+  //-     option(value="h4") Título 4
+  //-     option(value="h5") Título 5
+  //-     option(value="h6") Título 6
+
+  //-   select.rich-text-font-family(data-rich-font-family="rich-text-1")
+  //-     option(value="Roboto, sans-serif") Roboto
+  //-     option(value="Arial") Arial
+  //-     option(value="Arial Black") Arial Black
+  //-     option(value="Comic Sans MS") Comic Sans MS
+  //-     option(value="Courier New") Courier New
+  //-     option(value="Georgia") Georgia
+  //-     option(value="Impact") Impact
+  //-     option(value="Lucida Console") Lucida Console
+  //-     option(value="Lucida Sans Unicode") Lucida Sans Unicode
+  //-     option(value="Palatino Linotype") Palatino Linotype
+  //-     option(value="Tahoma") Tahoma
+  //-     option(value="Times New Roman") Times New Roman
+  //-     option(value="Trebuchet MS") Trebuchet MS
+  //-     option(value="Verdana") Verdana
+
+  //-   input.rich-text-font-size(type="number" value="24" data-rich-font-size="rich-text-1")
+
+  //-   select.rich-text-line-height(data-rich-line-height="rich-text-1")
+  //-     option(value="1") 1
+  //-     option(value="1.15") 1.15
+  //-     option(value="1.5") 1.5
+  //-     option(value="1.75") 1.75
+  //-     option(value="2") 2
+  //-     option(value="2.5") 2.5
+  //-     option(value="3") 3
+
+  //-   button.rich-text-bold(data-rich-bold="rich-text-1") <i class="fas fa-bold"></i>
+  //-   button.rich-text-italic(data-rich-italic="rich-text-1") <i class="fas fa-italic"></i>
+  //-   button.rich-text-underline(data-rich-underline="rich-text-1") <i class="fas fa-underline"></i>
+  //-   button.rich-text-strike(data-rich-strike="rich-text-1") <i class="fas fa-strikethrough"></i>
+  //-   input(type="color" value="#000000" data-rich-color="rich-text-1")
+  //-   input(type="color" value="#ffffff" data-rich-background-color="rich-text-1")
+
+  //-   select.rich-text-text-align(data-rich-text-align="rich-text-1")
+  //-     option(value="left") Esquerda
+  //-     option(value="center") Centro
+  //-     option(value="right") Direita
+  //-     option(value="justify") Justificado
+
+  //-   button.rich-text-list(data-rich-list="rich-text-1") <i class="fas fa-list"></i>
+  //-   button.rich-text-list-ol(data-rich-list-ol="rich-text-1") <i class="fas fa-list-ol"></i>
+
+  //- .rich-pages
+  //-   .rich-content(data-rich-content="rich-text-1" contenteditable="true" onspellcheck="true")
+
+script. 
+
+  document.body.addEventListener('keydown', e => {
+    const key = e.key,
+      code = e.code,
+      positon = document.getSelection().getRangeAt(0),
+      tag = positon.commonAncestorContainer.parentNode.tagName.toLowerCase();
+
+    const headerKeys = ['Key1', 'Key2', 'Key3', 'Key4', 'Key5', 'Key6', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6'];
+
+    if (e.ctrlKey && e.shiftKey && headerKeys.includes(code)) e.preventDefault();
+
+    const controlsKeys = ['KeyZ', 'KeyV', 'KeyY', 'KeyC', 'KeyA', 'Minus', 'Equal', 'KeyI', 'KeyT', 'KeyK', 'KeyEnter', 'KeyEspace'];
+
+    if (e.ctrlKey && controlsKeys.includes(code)) e.preventDefault();
+
+    const justifyKeys = ['KeyJ', 'KeyC', 'KeyL', 'KeyR', 'Key8', 'Key7'];
+    if (e.ctrlKey && e.shiftKey && justifyKeys.includes(code) || key === 'Tab') e.preventDefault();
+  });
+
+  function createElement(tag = "div", attributes = {}, othersAttributes = {}, childs = []) {
+    const element = document.createElement(tag);
+
+    if (attributes) Object.keys(attributes).forEach(key => element.setAttribute(key, attributes[key]));
+    if (othersAttributes) Object.keys(othersAttributes).forEach(key => {
+      element[key] = othersAttributes[key];
+      console.log(key)
+    });
+    
+    if (childs) childs.forEach(child => element.appendChild(createElement(child.tag, child.attributes, child.othersAttributes, child.childs)));
+
+    return element;
+  }
+
+  const commands = {
+    bold: () => document.execCommand('bold'),
+    italic: () => document.execCommand('italic'),
+    underline: () => document.execCommand('underline'),
+    strike: () => document.execCommand('strikeThrough'),
+    list: () => document.execCommand('insertUnorderedList'),
+    listOl: () => document.execCommand('insertOrderedList'),
+    textAlign: (value) => document.execCommand('justify' + value),
+    fontFamily: (value) => document.execCommand('fontName', false, value),
+    fontSize: (value) => document.execCommand('fontSize', false, value),
+    color: (value) => document.execCommand('foreColor', false, value),
+    backgroundColor: (value) => document.execCommand('backColor', false, value),
+    fontStyle: (value) => document.execCommand('formatBlock', false, value),
+    lineHeight: (value) => document.execCommand('lineHeight', false, value)
+  }
+
+  const richTexts = document.querySelectorAll('[data-rich-text]');
+
+  if (richTexts) {
+    richTexts.forEach(item => {
+      const richData = item.getAttribute('data-rich-text');
+      const richMenu = createElement("div", { class: "rich-text-menu" }, { "data-rich-menu": richData }, [
+        {
+          tag: "select",
+          attributes: { class: "rich-text-font-style", "data-rich-font-style": richData },
+          childs: [
+            { tag: "option", attributes: { value: "normal" }, othersAttributes: { innerText: "Texto normal"} },
+            { tag: "option", attributes: { value: "h1" }, othersAttributes: { innerText: "Título 1"} },
+            { tag: "option", attributes: { value: "h2" }, othersAttributes: { innerText: "Título 2"} },
+            { tag: "option", attributes: { value: "h3" }, othersAttributes: { innerText: "Título 3"} },
+            { tag: "option", attributes: { value: "h4" }, othersAttributes: { innerText: "Título 4"} },
+            { tag: "option", attributes: { value: "h5" }, othersAttributes: { innerText: "Título 5"} },
+            { tag: "option", attributes: { value: "h6" }, othersAttributes: { innerText: "Título 6"} },
+          ]
+        }, {
+          tag: "select",
+          attributes: { class: "rich-text-font-family", "data-rich-font-family": richData },
+          childs: [
+            { tag: "option", attributes: { value: "Roboto, sans-serif" }, othersAttributes: { innerText: "Roboto"} },
+            { tag: "option", attributes: { value: "Arial" }, othersAttributes: { innerText: "Arial"} },
+            { tag: "option", attributes: { value: "Arial Black" }, othersAttributes: { innerText: "Arial Black"} },
+            { tag: "option", attributes: { value: "Comic Sans MS" }, othersAttributes: { innerText: "Comic Sans MS"} },
+            { tag: "option", attributes: { value: "Courier New" }, othersAttributes: { innerText: "Courier New"} },
+            { tag: "option", attributes: { value: "Georgia" }, othersAttributes: { innerText: "Georgia"} },
+            { tag: "option", attributes: { value: "Impact" }, othersAttributes: { innerText: "Impact"} },
+            { tag: "option", attributes: { value: "Lucida Console" }, othersAttributes: { innerText: "Lucida Console"} },
+            { tag: "option", attributes: { value: "Lucida Sans Unicode" }, othersAttributes: { innerText: "Lucida Sans Unicode"} },
+            { tag: "option", attributes: { value: "Palatino Linotype" }, othersAttributes: { innerText: "Palatino Linotype"} },
+            { tag: "option", attributes: { value: "Tahoma" }, othersAttributes: { innerText: "Tahoma"} },
+            { tag: "option", attributes: { value: "Times New Roman" }, othersAttributes: { innerText: "Times New Roman"} },
+            { tag: "option", attributes: { value: "Trebuchet MS" }, othersAttributes: { innerText: "Trebuchet MS"} },
+            { tag: "option", attributes: { value: "Verdana" }, othersAttributes: { innerText: "Verdana"} },
+          ]
+        }, {
+          tag: "input",
+          attributes: { type: "number", class: "rich-text-font-size", value: "12", "data-rich-font-size": richData }
+        }, {
+          tag: "select",
+          attributes: { class: "rich-text-line-height", "data-rich-line-height": richData },
+          childs: [
+            { tag: "option", attributes: { value: "1" }, othersAttributes: { innerText: "1"} },
+            { tag: "option", attributes: { value: "1.15" }, othersAttributes: { innerText: "1.15"} },
+            { tag: "option", attributes: { value: "1.5" }, othersAttributes: { innerText: "1.5"} },
+            { tag: "option", attributes: { value: "1.75" }, othersAttributes: { innerText: "1.75"} },
+            { tag: "option", attributes: { value: "2" }, othersAttributes: { innerText: "2"} },
+            { tag: "option", attributes: { value: "2.5" }, othersAttributes: { innerText: "2.5"} },
+            { tag: "option", attributes: { value: "3" }, othersAttributes: { innerText: "3"} },
+          ]
+        }, {
+          tag: "button",
+          attributes: { class: "rich-text-bold", "data-rich-bold": richData },
+          othersAttributes: { innerHTML: '<i class="fas fa-bold"></i>' }
+        }, {
+          tag: "button",
+          attributes: { class: "rich-text-italic", "data-rich-italic": richData },
+          othersAttributes: { innerHTML: '<i class="fas fa-italic"></i>' }
+        }, {
+          tag: "button",
+          attributes: { class: "rich-text-underline", "data-rich-underline": richData },
+          othersAttributes: { innerHTML: '<i class="fas fa-underline"></i>' }
+        }, {
+          tag: "button",
+          attributes: { class: "rich-text-strike", "data-rich-strike": richData },
+          othersAttributes: { innerHTML: '<i class="fas fa-strikethrough"></i>' }
+        }, {
+          tag: "input",
+          attributes: { type: "color", value: "#000000", "data-rich-color": richData }
+        }, {
+          tag: "input",
+          attributes: { type: "color", value: "#ffffff", "data-rich-background-color": richData }
+        }, {
+          tag: "select",
+          attributes: { class: "rich-text-text-align", "data-rich-text-align": richData },
+          childs: [
+            { tag: "option", attributes: { value: "left" }, othersAttributes: { innerText: "Esquerda"} },
+            { tag: "option", attributes: { value: "center" }, othersAttributes: { innerText: "Centro"} },
+            { tag: "option", attributes: { value: "right" }, othersAttributes: { innerText: "Direita"} },
+            { tag: "option", attributes: { value: "justify" }, othersAttributes: { innerText: "Justificado"} },
+          ]
+        }, {
+          tag: "button",
+          attributes: { class: "rich-text-list", "data-rich-list": richData },
+          othersAttributes: { innerHTML: '<i class="fas fa-list"></i>' }
+        }, {
+          tag: "button",
+          attributes: { class: "rich-text-list-ol", "data-rich-list-ol": richData },
+          othersAttributes: { innerHTML: '<i class="fas fa-list-ol"></i>' }
+        }
+      ]);
+
+      const richContent = createElement("div", { class: "rich-pages"}, {}, [{ tag: "div", attributes: { class: "rich-content", contenteditable: "true", onspellcheck: "true", "data-rich-content": richData }, othersAttributes: { } }]);
+      item.appendChild(richMenu);
+      item.appendChild(richContent);
+
+      const rich = item.querySelector('[data-rich-content]');
+      rich.addEventListener('keyup', e => pageControl(e, rich, item));
+      rich.addEventListener('mouseup', e => style(e, item));
+
+      item.querySelector('[data-rich-font-style]').addEventListener('change', e => commands.fontStyle(e.target.value));
+      item.querySelector('[data-rich-font-family]').addEventListener('change', e => commands.fontFamily(e.target.value));
+      item.querySelector('[data-rich-font-size]').addEventListener('change', e => commands.fontSize(e.target.value));
+      item.querySelector('[data-rich-color]').addEventListener('change', e => commands.color(e.target.value));
+      item.querySelector('[data-rich-line-height]').addEventListener('change', e => commands.lineHeight(e.target.value));
+      item.querySelector('[data-rich-background-color]').addEventListener('change', e => commands.backgroundColor(e.target.value));
+      item.querySelector('[data-rich-bold]').addEventListener('click', e => commands.bold());
+      item.querySelector('[data-rich-italic]').addEventListener('click', e => commands.italic());
+      item.querySelector('[data-rich-underline]').addEventListener('click', e => commands.underline());
+      item.querySelector('[data-rich-strike]').addEventListener('click', e => commands.strike());
+      item.querySelector('[data-rich-text-align]').addEventListener('change', e => commands.textAlign(e.target.value));
+      item.querySelector('[data-rich-list]').addEventListener('click', e => commands.list());
+      item.querySelector('[data-rich-list-ol]').addEventListener('click', e => commands.listOl());
+
+    
+    //- const rich = item.querySelector('[data-rich-content]');
+    //- rich.addEventListener('keyup', e => pageControl(e, rich, item));
+    //- rich.addEventListener('mouseup', e => style(e, item));
+
+    //- item.querySelector('[data-rich-font-style]').addEventListener('change', e => commands.fontStyle(e.target.value));
+    //- item.querySelector('[data-rich-font-family]').addEventListener('change', e => commands.fontFamily(e.target.value));
+    //- item.querySelector('[data-rich-font-size]').addEventListener('change', e => commands.fontSize(e.target.value));
+    //- item.querySelector('[data-rich-color]').addEventListener('change', e => commands.color(e.target.value));
+    //- item.querySelector('[data-rich-line-height]').addEventListener('change', e => commands.lineHeight(e.target.value));
+    //- item.querySelector('[data-rich-background-color]').addEventListener('change', e => commands.backgroundColor(e.target.value));
+    //- item.querySelector('[data-rich-bold]').addEventListener('click', e => commands.bold());
+    //- item.querySelector('[data-rich-italic]').addEventListener('click', e => commands.italic());
+    //- item.querySelector('[data-rich-underline]').addEventListener('click', e => commands.underline());
+    //- item.querySelector('[data-rich-strike]').addEventListener('click', e => commands.strike());
+    //- item.querySelector('[data-rich-text-align]').addEventListener('change', e => commands.textAlign(e.target.value));
+    //- item.querySelector('[data-rich-list]').addEventListener('click', e => commands.list());
+    //- item.querySelector('[data-rich-list-ol]').addEventListener('click', e => commands.listOl());
+
+    });
+  }
+
+  function pageControl(e, me, fater){
+    style(e, fater);
+
+    const key = e.key,
+      code = e.code,
+      positon = document.getSelection().getRangeAt(0),
+      tag = positon.commonAncestorContainer.parentNode.tagName.toLowerCase(),
+      component = positon.commonAncestorContainer;
+
+    // cria uma lisat nao ordenada: ctrl + shift + 8 ou *
+    // cria uma lista ordenada: ctrl + shift + 7 ou &
+
+    if (e.ctrlKey && e.shiftKey && key === '*' || key === '&' || key === '8' || key === '7') {
+      const list = key === '*' || key === '8' ? 'ul' : 'ol';
+      if (list === 'ul') document.execCommand('insertUnorderedList');
+      else document.execCommand('insertOrderedList');
+    }
+
+    // justifica o texto: ctrl + shift + key J, C, L, R
+    // centraliza o texto: ctrl + shift + c
+    // alinha o texto a esquerda: ctrl + shift + l
+    // alinha o texto a direita: ctrl + shift + r
+    const justifyKeys = ['KeyJ', 'KeyC', 'KeyL', 'KeyR'];
+    if (e.ctrlKey && e.shiftKey && justifyKeys.includes(code)) {
+      document.execCommand('justify' + (justifyKeys.indexOf(code) === 0 ? 'Full' : justifyKeys.indexOf(code) === 1 ? 'Center' : justifyKeys.indexOf(code) === 2 ? 'Left' : 'Right'));
+    }
+
+    // títulos: ctrl + shift + 1, 2, 3, 4, 5, 6
+    // ctrl + shift + !, @, #, $, %, &
+    const headerKeys = ['Key1', 'Key2', 'Key3', 'Key4', 'Key5', 'Key6', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6'];
+    if (e.ctrlKey && e.shiftKey && headerKeys.includes(code)) {
+      const hs = ["!", "@", "#", "$", "%", "&"];
+      document.execCommand('formatBlock', false, 'h' + (hs.includes(key) ? hs.indexOf(key) + 1 : key));
+    }
+
+    // link 
+    if (e.ctrlKey && key === 'k') {
+      const link = prompt('Digite o link: ');
+      document.execCommand('createLink', false, link);
+    }
+
+    // remove formatação: ctrl + space
+    if (e.ctrlKey && key === ' ') document.execCommand('removeFormat');
+
+    // cria um novo parágrafo: ctrl + enter
+    if (e.ctrlKey && key === 'Enter') document.execCommand('insertParagraph');
+
+    //ctrl + z, v, y, c, a
+    const selectKeys = ['KeyZ', 'KeyV', 'KeyY', 'KeyC', 'KeyA']
+    if (e.ctrlKey && selectKeys.includes(code)) {
+      if (code === 'KeyZ') document.execCommand('undo');
+      if (code === 'KeyY') document.execCommand('redo');
+      if (code === 'KeyV') document.execCommand('paste', null, null);
+      if (code === 'KeyC') document.execCommand('copy');
+      if (code === 'KeyA') document.execCommand('selectAll');
+    }
+
+    // tab
+    if (e.key === 'Tab') {
+      e.preventDefault();
+
+      // se for um elemento de lista: ul ou ol
+      if (tag === 'li') {
+        const list = positon.commonAncestorContainer.parentNode.parentNode.tagName.toLowerCase();
+        const level = positon.commonAncestorContainer.parentNode.parentNode.parentNode.tagName.toLowerCase();
+        if (list === 'ul') {
+          // se for uma lista não ordenada, cria um novo elemento de lista com um tab de distância de acordo com o nível
+          document.execCommand('insertHTML', false, '<li style="margin-left: ' + (level === 'ul' ? '40px' : level === 'ol' ? '80px' : '120px') + ';">&#009</li>');
+        }
+
+        if (list === 'ol') {
+          // se for uma lista ordenada, cria um novo elemento de lista com um tab de distância, de acordo com o nível
+          document.execCommand('insertHTML', false, '<li style="margin-left: ' + (level === 'ul' ? '40px' : level === 'ol' ? '80px' : '120px') + ';">&#009</li>');
+        }
+
+      } else document.execCommand('insertHTML', false, '&#009');
+    }
+
+    // Minus e Plus
+    const fontSizeControls = ['-', '='];
+    if (e.ctrlKey && fontSizeControls.includes(key)) {
+      if (key === '-') {
+        document.execCommand('decreaseFontSize', false, true);
+      } else {
+        document.execCommand('incraseFontSize', false, true);
+      }
+    }
+
+    // add imagem: ctrl + alt + i
+    if (e.ctrlKey && e.altKey && key === 'i') {
+      e.preventDefault();
+      const url = prompt('Digite a url da imagem: ');
+      document.execCommand('insertImage', false, url);
+    }
+
+    // add table: ctrl + alt + t
+    if (e.ctrlKey && e.altKey && key === 't') {
+      e.preventDefault();
+      const rows = prompt('Digite o número de linhas: '),
+        cols = prompt('Digite o número de colunas: ');
+      document.execCommand('insertHTML', false, `<table style="width: 100%; border-collapse: collapse; border: 1px solid #ccc;">${'<tr>' + '<td style="border: 1px solid #ccc; padding: 5px;">' + '</td>'.repeat(cols) + '</tr>'.repeat(rows)}</table>`);
+    }
+  }
+
+  function style(e, father){
+    const position = document.getSelection().getRangeAt(0),
+      text = e.target.innerHTML, 
+      tag = position.commonAncestorContainer.parentNode.tagName.toLowerCase(),
+      child = position.commonAncestorContainer.parentNode,
+      allStyle = getComputedStyle(child);
+
+    const elements = {
+      color: father.querySelector('[data-rich-color]'),
+      backgroundColor: father.querySelector('[data-rich-background-color]'),
+      fontFamily: father.querySelector('[data-rich-font-family]'),
+      fontSize: father.querySelector('[data-rich-font-size]'),
+      fontStyle: father.querySelector('[data-rich-font-style]'),
+      textAlign: father.querySelector('[data-rich-text-align]'),
+      bold: father.querySelector('[data-rich-bold]'),
+      italic: father.querySelector('[data-rich-italic]'),
+      underline: father.querySelector('[data-rich-underline]'),
+      strike: father.querySelector('[data-rich-strike]'),
+      listUl: father.querySelector('[data-rich-list]'),
+      listOl: father.querySelector('[data-rich-list-ol]')
+    }
+
+    const style = {
+      fontFamily: allStyle.fontFamily.replace(/"/g, ""),
+      fontSize: allStyle.fontSize,
+      backgroundColor: allStyle.backgroundColor,
+      color: allStyle.color,
+      fontStyle: allStyle.fontStyle,
+      listStyleType: allStyle.listStyleType,
+      textAlign: allStyle.textAlign === 'start' ? 'left' : allStyle.textAlign,
+      fontStretch: allStyle.fontStretch,
+      fontStyle: allStyle.fontStyle,
+      fontWeight: allStyle.fontWeight,
+      textDecoration: allStyle.textDecoration,
+      textTransform: allStyle.textTransform,
+      verticalAlign: allStyle.verticalAlign,
+      textDecorationLine: allStyle.textDecorationLine,
+      textDecorationStyle: allStyle.textDecorationStyle
+    }
+
+    const titles = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+    elements.color.value = "#" + rgb2Hex(style.color);
+    elements.backgroundColor.value = "#" + rgb2Hex(style.backgroundColor);
+    elements.fontFamily.value = style.fontFamily;
+    elements.fontSize.value = Number(style.fontSize.replace('px', ''));
+    elements.fontStyle.value = titles.includes(tag) ? tag : "normal";
+    elements.textAlign.value = style.textAlign;
+    elements.bold.classList.toggle('rich-active', style.fontWeight >= 600);
+    elements.italic.classList.toggle('rich-active', style.fontStyle === 'italic');
+    elements.underline.classList.toggle('rich-active', style.textDecorationLine === 'underline');
+    elements.strike.classList.toggle('rich-active', style.textDecorationLine === 'line-through');
+
+    if (tag == 'li') 
+      elements.listUl.classList.toggle('rich-active', style.listStyleType === 'disc' || style.listStyleType === 'circle' || style.listStyleType === 'square');
+      elements.listOl.classList.toggle('rich-active', style.listStyleType === 'decimal');
+  }
+
+  function rgb2Hex(color){
+    if (color.includes('rgb') && !color.includes('rgba')) {
+      return color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/).slice(1).map(function (x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
+        })
+        .join("");
+    }
+
+    if (color.includes('rgba')) {
+      return color.match(/^rgba\((\d+),\s*(\d+),\s*(\d+),\s*(\d+)\)$/).slice(1, 4).map(function (x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
+        })
+        .join("");
+    }
+  }

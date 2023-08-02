@@ -1,0 +1,40 @@
+h3 Minhas notas 
+#bulletin-msg
+form.bulletins(action="/bulletin" method="POST", id="bulletins")  
+  each bulletin, index in discipline.bulletins
+    div#bulletin-list
+      .bulletin 
+        input(type="hidden", value=bulletin.id, readonly, name=`${bulletin.type}${index}[id]`, required)
+        input(type="text", value=bulletin.title, readonly, name=`${bulletin.type}${index}[title]`, required)
+        p Nota
+        input(type="number", value=bulletin.value, name=`${bulletin.type}${index}[value]`, min="0", max="10", step="0.1", required)
+        p Peso
+        input(type="number", value=bulletin.weight, name=`${bulletin.type}${index}[weight]`, min="0", max="10", step="0.1", required)
+        p Tipo
+        input(type="text", value=bulletin.type, readonly, name=`${bulletin.type}${index}[type]`, required)
+        if index > 1 && index < discipline.bulletins.length - 2
+          button(type="button", onclick="removeNote(this)") <i class="fas fa-trash-alt"></i> Remover
+  //button(type="submit") <i class="fas fa-save"></i> Salvar
+  button(type="button", onclick="addNote()") <i class="fas fa-plus"></i> Adicionar nota
+
+script.
+  const inputs = document.querySelector("#bulletin-list").querySelectorAll("input"),
+   form = document.querySelector("#bulletins"),
+   bulletinMsg = document.querySelector("#bulletin-msg");
+
+  inputs.forEach(input => input.addEventListener("change", () => form.submit()));
+
+  // não recarregar a página ao enviar o formulário
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: form.method,
+      body: formData
+    }).then(response => {
+      if (response.ok) return response.json();
+      else throw new Error("Erro ao salvar notas");
+    }).then(data => bulletinMsg.innerHTML = data.message);
+  });

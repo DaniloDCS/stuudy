@@ -1,45 +1,142 @@
 extends ../layout
 block content
-  h3 Meus cursos 
-  if !courses.length
-    p Nenhum curso encontrado
-  else
-    ul
-      each course in courses
-        li= course.name  
-          a(href="/courses/course/" + course.id) | Acessar 
 
-  h3 Cadastrar um novo curso
-  form(action="/courses/register" method="POST")
-    div 
-      label(for="name") Nome do curso
-      input(type="text" name="name" id="name")
-    div
-      label(for="icon") Ícone do curso
-      input(type="text" name="icon" id="icon")
-    div
-      label(for="description") Descrição do curso
-      input(type="text" name="description" id="description")
-    div
-      label(for="university") Universidade
-      input(type="text" name="university" id="university")
-    div
-      label(for="location") Localização
-      input(type="text" name="location" id="location")
-    div
-      label(for="status") Status
-      input(type="text" name="status" id="status")
-    div
-      label(for="level") Nível
-      input(type="text" name="level" id="level")
-    div
-      label(for="type") Tipo
-      input(type="text" name="type" id="type")
-    div
-      label(for="startedIn") Início
-      input(type="date" name="startedIn" id="startedIn")
-    div
-      label(for="finishedIn") Término
-      input(type="date" name="finishedIn" id="finishedIn")
-    div
-      button(type="submit") Cadastrar
+  style. 
+    .courses {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .courses .course {
+      width: 48%;
+      height: 100px;
+      margin: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid #ccc;
+      position: relative;
+      color: black;
+      display: flex;
+      align-items: center;
+      justify-content: space-betwen;
+      border-radius: 20px;
+      padding: 10px 15px;
+    }
+
+    .courses .course:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      text-decoration: none;
+    }
+
+    .course .course-icon {
+      width: 60px;
+      height: 60px;
+      background-color: rgba(250, 250, 250, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      font-size: xx-large;
+    }
+
+    .course-details {
+      width: 100%;
+      padding: 10px;
+      color: white;
+    }
+
+    .course-progress {
+      width: 100%;
+      height: 15px;
+      border-radius: 20px;
+      background-color: #ccc;
+      margin: 6px 0;
+    }
+
+    .course-progress-bar {
+      height: 100%;
+      background-color: blue;
+      border-radius: 20px;
+      min-width: fit-content;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      color: white;
+      font-weigth: bold;
+      font-size: x-small;
+      padding: 0 5px;
+    }
+
+  .w-100
+    h2 Meus cursos 
+    if !courses.length
+      p Nenhum curso encontrado
+    else
+      .courses
+        each course, index in courses
+          a.course(href="/course/c/" + course.id)
+            .course-icon #{course.icon} 
+            .course-details
+              .course-title #{course.name}
+              .course-progress
+                .course-progress-bar(style=`width: ${course.dados.workloadPercentage}%`) #{course.dados.workloadPercentage}%
+              .course-status #{course.status}
+            
+    button(data-btn-modal="register-course") <i class="fas fa-folder-plus"></i> Registrar um novo curso
+    .modal.modal-lg(data-modal="register-course")
+      form.modal-content(action="/course/register" method="POST")
+        .modal-header
+          span(data-modal-close="register-course") <i class="fas fa-times-circle"></i>
+          h3 Registrar um novo curso
+        .modal-body
+          .form-item 
+            label(for="name") <i class="fas fa-book"></i> Nome do curso
+            input(type="text" name="name" id="name")
+          .form-item
+            label(for="icon") <i class="fas fa-icons"></i> Ícone do curso
+            input(type="text" name="icon" id="icon")
+          .form-item
+            label(for="description") <i class="fas fa-align-left"></i> Descrição
+            input(type="text" name="description" id="description")
+          .form-item
+            label(for="university") <i class="fas fa-university"></i> Universidade
+            input(type="text" name="university" id="university")
+          .form-item
+            label(for="location") <i class="fas fa-map-marker-alt"></i> Localização
+            input(type="text" name="location" id="location")
+          .form-item
+            label(for="status") <i class="fas fa-info-circle"></i> Status
+            select#status(name="status")
+              option(value="studying") Estudando
+              option(value="concluded") Concluído
+              option(value="dropped") Abandonado
+              option(value="cancelled") Cancelado
+              option(value="failed") Reprovado
+              option(value="waiting") Aguardando
+          .form-item
+            label(for="level") <i class="fas fa-layer-group"></i> Nível
+            input(type="text" name="level" id="level")
+          .form-item
+            label(for="type") <i class="fas fa-layer-group"></i> Tipo
+            input(type="text" name="type" id="type")
+          .form-item
+            label(for="startedIn") <i class="fas fa-calendar-alt"></i> Início
+            input(type="date" name="startedIn" id="startedIn")
+          .form-item
+            label(for="finishedIn") <i class="fas fa-calendar-alt"></i> Fim
+            input(type="date" name="finishedIn" id="finishedIn")
+        .modal-footer
+          button.modal-btn-cancel(data-modal-close="register-course", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+          button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+  script. 
+    const courses = document.querySelectorAll('.course');
+    const backgrounds = ["bg-blue", "bg-red", "bg-green", "bg-yellow", "bg-purple", "bg-white", "bg-gray", "bg-black", "bg-brown", "bg-orange", "bg-pink", "bg-cyan", "bg-indigo", "bg-teal", "bg-lime", "bg-amber"];  
+
+    function random(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    if (courses) courses.forEach(course => course.classList.add(backgrounds[random(0, backgrounds.length - 1)]));

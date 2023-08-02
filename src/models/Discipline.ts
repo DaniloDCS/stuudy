@@ -1,4 +1,14 @@
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from "uuid";
+import { Reminder } from "./Reminder";
+import { Book } from "./Book";
+import { TODO } from "./TODO";
+import { Resume } from "./Resume";
+import { Activity } from "./Activity";
+import { Work } from "./Work";
+import { Evaluation } from "./Evaluation";
+import { Class } from "./Class";
+import { Unity } from "./Unity";
+import { Bulletin } from "./Bulletin";
 
 interface IDiscipline {
   readonly id?: string;
@@ -15,13 +25,14 @@ interface IDiscipline {
   teachers: Teacher[];
   periodId: string;
   bulletins?: Bulletin[];
-  unities?: Unity[]
+  unities?: Unity[];
   evaluations?: Evaluation[];
   workers?: Work[];
   activities?: Activity[];
   resumes?: Resume[];
-  medias?: Media[];
-  TODOs?: TODOs[];
+  TODOs?: TODO[];
+  books?: Book[];
+  reminders?: Reminder[];
   readonly createdAt?: Date;
   updatedAt?: Date;
 }
@@ -41,28 +52,54 @@ class Discipline implements IDiscipline {
   teachers: Teacher[];
   periodId: string;
   bulletins: Bulletin[];
-  unities: Unity[]
+  unities: Unity[];
   evaluations: Evaluation[];
   workers: Work[];
   activities: Activity[];
   resumes: Resume[];
-  medias: Media[];
-  TODOs: TODOs[];
+  TODOs: TODO[];
+  books: Book[];
+  reminders: Reminder[];
   createdAt: Date;
   updatedAt: Date;
 
-  constructor({ id, name, icon, code, credits, workload, workloadCompleted, progress, media, status, type, teachers, periodId, bulletins, unities, evaluations, workers, activities, resumes, medias, TODOs, createdAt, updatedAt }: IDiscipline) {
+  constructor({
+    id,
+    name,
+    icon,
+    code,
+    credits,
+    workload,
+    workloadCompleted,
+    progress,
+    media,
+    status,
+    type,
+    teachers,
+    periodId,
+    bulletins,
+    unities,
+    evaluations,
+    workers,
+    activities,
+    resumes,
+    TODOs,
+    books,
+    reminders,
+    createdAt,
+    updatedAt,
+  }: IDiscipline) {
     this.id = id || uuid();
     this.name = name;
-    this.icon = icon || '&#128218;';
-    this.code = code || '';
+    this.icon = icon || "&#128218;";
+    this.code = code || "";
     this.credits = credits;
     this.workload = workload;
     this.workloadCompleted = workloadCompleted || 0;
     this.progress = progress || 0;
     this.media = media || 0;
-    this.status = status || 'studying';
-    this.type = type || 'obligatory';
+    this.status = status || "studying";
+    this.type = type || "obligatory";
     this.teachers = teachers || [];
     this.periodId = periodId;
     this.unities = unities || [];
@@ -70,33 +107,48 @@ class Discipline implements IDiscipline {
     this.workers = workers || [];
     this.activities = activities || [];
     this.resumes = resumes || [];
-    this.medias = medias || [];
     this.TODOs = TODOs || [];
+    this.books = books || [];
+    this.reminders = reminders || [];
     this.createdAt = createdAt || new Date();
     this.updatedAt = updatedAt || new Date();
 
-    let numberOfBulletins = this.credits < 4 ? 2 : this.credits >= 4 && this.credits <= 6 ? 3 : 4;
+    let numberOfBulletins =
+      this.credits < 4 ? 2 : this.credits >= 4 && this.credits <= 6 ? 3 : 4;
     numberOfBulletins += 2;
 
-    this.bulletins = bulletins || new Array(numberOfBulletins).fill(0).map((_, index) => {
-      const weight = 1;
-      const value = 0;
-      const title = index < numberOfBulletins - 2 ? `Avaliação ${index + 1}` : index === numberOfBulletins - 2 ? 'Média' : 'Exame Final';
-      const type = index < numberOfBulletins - 2 ? `evaluation` : index === numberOfBulletins - 2 ? 'media' : 'final';
+    this.bulletins =
+      bulletins ||
+      new Array(numberOfBulletins).fill(0).map((_, index) => {
+        const weight = 1;
+        const value = 0;
+        const title =
+          index < numberOfBulletins - 2
+            ? `Avaliação ${index + 1}`
+            : index === numberOfBulletins - 2
+            ? "Média"
+            : "Exame Final";
+        const type =
+          index < numberOfBulletins - 2
+            ? `evaluation`
+            : index === numberOfBulletins - 2
+            ? "media"
+            : "final";
 
-      return new Bulletin({ title, value, weight, type });
-    });
+        return new Bulletin({ title, value, weight, type });
+      });
 
     numberOfBulletins -= 2;
-    this.unities = unities || new Array(numberOfBulletins).fill(0).map((_, index) => {
-      const title = `Unidade ${index + 1}`;
-      const weight = 1;
-      const value = 0;
-      const type = 'unity';
+    this.unities =
+      unities ||
+      new Array(numberOfBulletins).fill(0).map((_, index) => {
+        const title = `Unidade ${index + 1}`;
+        const weight = 1;
+        const value = 0;
+        const type = "unity";
 
-      return new Unity({ title });
-    });
-
+        return new Unity({ title });
+      });
   }
 
   public getId = (): string => this.id;
@@ -129,53 +181,65 @@ class Discipline implements IDiscipline {
 
   public getUpdatedAt = (): Date => this.updatedAt;
 
-  public setName = (name: string) => this.name = name;
+  public setName = (name: string) => (this.name = name);
 
-  public setCode = (code: string) => this.code = code;
+  public setCode = (code: string) => (this.code = code);
 
-  public setIcon = (icon: string) => this.icon = icon;
+  public setIcon = (icon: string) => (this.icon = icon);
 
-  public setCredits = (credits: number) => this.credits = credits;
+  public setCredits = (credits: number) => (this.credits = credits);
 
-  public setWorkload = (workload: number) => this.workload = workload;
+  public setWorkload = (workload: number) => (this.workload = workload);
 
-  public setWorkloadCompleted = (workloadCompleted: number) => this.workloadCompleted = workloadCompleted;
+  public setWorkloadCompleted = () => {
+    this.workloadCompleted = this.unities.reduce(
+      (acc: number, u: Unity) => acc + new Unity(u).getWorkloadCompleted(),
+      0
+    );
+  };
 
-  public setProgress = (progress: number) => this.progress = progress;
+  public setProgress = () => {
+    this.progress = Number(
+      (
+        (Number(this.getWorkloadCompleted()) / Number(this.getWorkload())) *
+        100
+      ).toFixed(2)
+    );
+  };
 
-  public setStatus = (status: string) => this.status = status;
+  public setStatus = (status: string) => (this.status = status);
 
-  public setType = (type: string) => this.type = type;
+  public setType = (type: string) => (this.type = type);
 
   public setTeachers = (teacher: Teacher) => this.teachers.push(teacher);
 
-  public deleteTeacher = (teacher: Teacher) => this.teachers = this.teachers.filter(t => t.name !== teacher.name);
+  public deleteTeacher = (teacher: Teacher) =>
+    (this.teachers = this.teachers.filter((t) => t.name !== teacher.name));
 
-  public setPeriodId = (periodId: string) => this.periodId = periodId;
+  public setPeriodId = (periodId: string) => (this.periodId = periodId);
 
-  public setUpdatedAt = () => this.updatedAt = new Date();
+  public setUpdatedAt = () => (this.updatedAt = new Date());
 
   public getBulletins = (): Bulletin[] => this.bulletins;
 
   public getBulletinsById = (id: string): Bulletin => {
     return this.bulletins.filter((b: Bulletin) => b.id === id)[0];
-  }
+  };
 
   public deleteBulletinsById = (id: string) => {
     this.bulletins = this.bulletins.filter((b: Bulletin) => b.id !== id);
-  }
+  };
 
   public updateBulletinsById = (id: string, bulletin: Bulletin) => {
     this.bulletins = this.bulletins.map((b: Bulletin) => {
       if (b.id === id) return bulletin;
       else return b;
     });
-  }
+  };
 
   public setBulletins = (bulletins: Bulletin) => this.bulletins.push(bulletins);
 
   public updateBulletins = (notes: Bulletin[]) => {
-
     this.bulletins = notes;
 
     // calcular média
@@ -183,493 +247,279 @@ class Discipline implements IDiscipline {
     let weight = 0;
 
     this.bulletins.forEach((b: Bulletin) => {
-      if (b.type === 'evaluation') {
+      if (b.type === "evaluation") {
         sum += Number(b.value) * Number(b.weight);
         weight += Number(b.weight);
       }
     });
 
-    this.media = Number(((sum / weight) || 0).toFixed(1));
+    this.media = Number((sum / weight || 0).toFixed(1));
 
     this.bulletins = this.bulletins.map((b: Bulletin) => {
-      if (b.type === 'media') b.value = this.media || 0;
+      if (b.type === "media") b.value = this.media || 0;
       return b;
     });
 
     return this;
-  }
+  };
 
   public getUnities = (): Unity[] => this.unities;
 
   public getUnitiesById = (id: string): Unity => {
     return this.unities.filter((u: Unity) => u.id === id)[0];
-  }
+  };
 
   public deleteUnitiesById = (id: string) => {
     this.unities = this.unities.filter((u: Unity) => u.id !== id);
-  }
+  };
 
   public updateUnitiesById = (id: string, unities: Unity) => {
     this.unities = this.unities.map((u: Unity) => {
       if (u.id === id) return unities;
       else return u;
     });
-  }
+  };
 
   public setUnities = (unities: Unity) => this.unities.push(unities);
+
+  public setNewUnity = () => {
+    this.unities.push(
+      new Unity({
+        title: `Unidade ${this.unities.length + 1}`,
+      })
+    );
+  };
+
+  public getUnity = (id: string): Unity => {
+    return this.unities.filter((u: Unity) => u.id === id)[0];
+  };
+
+  public deleteUnity = (id: string) => {
+    this.unities = this.unities.filter((unity) => unity.id != id);
+
+    this.setWorkloadCompleted();
+    this.setProgress();
+    this.setUpdatedAt();
+  };
+
+  public getClassById = (id: string): Class | null => {
+    let class_: any = {};
+
+    this.unities.forEach((u: Unity) => {
+      const unity = new Unity(u);
+      const c = unity.getClassById(id);
+      if (c) class_ = new Class(c);
+    });
+
+    return class_;
+  };
 
   public setClass = (unityId: string, _class: Class) => {
     this.unities = this.unities.map((u: Unity) => {
       const uu = new Unity(u);
-      if (uu.id === unityId) {
-        uu.setClasses(_class);
-        this.workloadCompleted = Number(this.workloadCompleted) + Number(_class.quantity);
-        this.progress = (Number(this.workloadCompleted) / Number(this.workload)) * 100;
-      }
+
+      if (uu.id === unityId) uu.setClasses(_class);
+
       return uu;
     });
-  }
 
-  public deleteClass = (unityId: string, classId: string) => {
+    this.setWorkloadCompleted();
+    this.setProgress();
+  };
+
+  public deleteClassById = (unityId: string, classId: string) => {
     this.unities = this.unities.map((u: Unity) => {
-      if (u.id === unityId) u.deleteClassesById(classId);
+      if (u.id === unityId) u.deleteClassById(classId);
       return u;
     });
-  }
+  };
+
+  public getUnityIdByClassId = (classId: string): string => {
+    let id: string = "";
+    this.unities.forEach((u: Unity) => {
+      if (new Unity(u).getClassById(classId)) id = u.id || "";
+    });
+
+    return id;
+  };
+
+  public updateClassById = (unityId: string, _class: Class) => {
+    this.unities = this.unities.map((u: Unity) => {
+      let unity = new Unity(u);
+      if (unity.getId() === unityId)
+        unity.updateClassById(_class.getId(), _class);
+      return unity;
+    });
+  };
 
   public getEvaluations = (): Evaluation[] => this.evaluations;
 
-  public getEvaluationsById = (id: string): Evaluation => {
+  public getEvaluationById = (id: string): Evaluation => {
     return this.evaluations.filter((e: Evaluation) => e.id === id)[0];
-  }
+  };
 
-  public deleteEvaluationsById = (id: string) => {
+  public deleteEvaluationById = (id: string) => {
     this.evaluations = this.evaluations.filter((e: Evaluation) => e.id !== id);
-  }
+  };
 
-  public updateEvaluationsById = (id: string, evaluations: Evaluation) => {
+  public updateEvaluationById = (id: string, evaluation: Evaluation) => {
     this.evaluations = this.evaluations.map((e: Evaluation) => {
-      if (e.id === id) return evaluations;
+      if (e.id === id) return evaluation;
       else return e;
     });
-  }
+  };
 
-  public setEvaluations = (evaluations: Evaluation) => this.evaluations.push(evaluations);
+  public setEvaluation = (evaluation: Evaluation) =>
+    this.evaluations.push(evaluation);
 
   public getWorkers = (): Work[] => this.workers;
 
-  public getWorkersById = (id: string): Work => {
+  public getWorkById = (id: string): Work => {
     return this.workers.filter((w: Work) => w.id === id)[0];
-  }
+  };
 
-  public deleteWorkersById = (id: string) => {
+  public deleteWorkById = (id: string) => {
     this.workers = this.workers.filter((w: Work) => w.id !== id);
-  }
+  };
 
-  public updateWorkersById = (id: string, workers: Work) => {
+  public updateWorkById = (id: string, workers: Work) => {
     this.workers = this.workers.map((w: Work) => {
       if (w.id === id) return workers;
       else return w;
     });
-  }
+  };
 
-  public setWorkers = (workers: Work) => this.workers.push(workers);
+  public setWork = (workers: Work) => this.workers.push(workers);
 
   public getActivities = (): Activity[] => this.activities;
 
-  public getActivitiesById = (id: string): Activity => {
-    return this.activities.filter((a: Activity) => a.id === id)[0];
-  }
-
-  public deleteActivitiesById = (id: string) => {
+  public deleteActivityById = (id: string) => {
     this.activities = this.activities.filter((a: Activity) => a.id !== id);
-  }
+  };
 
-  public updateActivitiesById = (id: string, activities: Activity) => {
+  public updateActivityById = (id: string, activities: Activity) => {
     this.activities = this.activities.map((a: Activity) => {
       if (a.id === id) return activities;
       else return a;
     });
-  }
+  };
 
-  public setActivities = (activities: Activity) => this.activities.push(activities);
+  public setActivity = (activity: Activity) => this.activities.push(activity);
+
+  public getActivityById = (id: string): Activity => {
+    return this.activities.filter((a: Activity) => a.id === id)[0];
+  };
 
   public getResumes = (): Resume[] => this.resumes;
 
-  public getResumesById = (id: string): Resume => {
+  public getResumeById = (id: string): Resume => {
     return this.resumes.filter((r: Resume) => r.id === id)[0];
-  }
+  };
 
-  public deleteResumesById = (id: string) => {
+  public deleteResumeById = (id: string) => {
     this.resumes = this.resumes.filter((r: Resume) => r.id !== id);
-  }
+  };
 
-  public updateResumesById = (id: string, resumes: Resume) => {
+  public updateResumeById = (id: string, resumes: Resume) => {
     this.resumes = this.resumes.map((r: Resume) => {
       if (r.id === id) return resumes;
       else return r;
     });
-  }
+  };
 
-  public setResumes = (resumes: Resume) => this.resumes.push(resumes);
+  public setResume = (resumes: Resume) => this.resumes.push(resumes);
 
-  public getMedias = (): Media[] => this.medias;
+  public getTODOs = (): TODO[] => this.TODOs;
 
-  public getMediasById = (id: string): Media => {
-    return this.medias.filter((m: Media) => m.id === id)[0];
-  }
+  public getTodoById = (id: string): TODO => {
+    return this.TODOs.filter((T: TODO) => T.id === id)[0];
+  };
 
-  public deleteMediasById = (id: string) => {
-    this.medias = this.medias.filter((m: Media) => m.id !== id);
-  }
+  public deleteTODOById = (id: string) => {
+    this.TODOs = this.TODOs.filter((t: TODO) => t.id !== id);
+  };
 
-  public updateMediasById = (id: string, medias: Media) => {
-    this.medias = this.medias.map((m: Media) => {
-      if (m.id === id) return medias;
-      else return m;
-    });
-  }
-
-  public setMedias = (medias: Media) => this.medias.push(medias);
-
-  public getTODOs = (): TODOs[] => this.TODOs;
-
-  public getTODOsById = (id: string): TODOs => {
-    return this.TODOs.filter((T: TODOs) => T.id === id)[0];
-  }
-
-  public deleteTODOsById = (id: string) => {
-    this.TODOs = this.TODOs.filter((t: TODOs) => t.id !== id);
-  }
-
-  public updateTODOsById = (id: string, TODOs: TODOs) => {
-    this.TODOs = this.TODOs.map((T: TODOs) => {
+  public updateTODOById = (id: string, TODOs: TODO) => {
+    this.TODOs = this.TODOs.map((T: TODO) => {
       if (T.id === id) return TODOs;
       else return T;
     });
+  };
+
+  public setTODO = (TODO: TODO) => {
+    this.TODOs.push(TODO);
+    // order by date: the most recent first
+    this.TODOs = this.TODOs.sort((a: TODO, b: TODO) => {
+      if (!a.finishIn) a.finishIn = a.concludedAt
+      if (!b.finishIn) b.finishIn = b.concludedAt
+      return Number(new Date(a.finishIn)) - Number(new Date(b.finishIn));
+    });
   }
 
-  public setTODOs = (TODOs: TODOs) => this.TODOs.push(TODOs);
+  public setBook = (book: Book) => this.books.push(book);
 
+  public getBooks = (): Book[] => this.books;
 
+  public getBookById = (id: string): Book => {
+    return this.books.filter((b: Book) => b.id === id)[0];
+  };
+
+  public deleteBookById = (id: string) => {
+    this.books = this.books.filter((b: Book) => b.id !== id);
+  };
+
+  public updateBookById = (id: string, books: Book) => {
+    this.books = this.books.map((b: Book) => {
+      if (b.id === id) return books;
+      else return b;
+    });
+  };
+
+  public setTeacher = (teacher: Teacher) => this.teachers.push(teacher);
+
+  public getTeachersById = (id: string): Teacher => {
+    return this.teachers.filter((t: Teacher) => t.id === id)[0];
+  };
+
+  public deleteTeachersById = (id: string) => {
+    this.teachers = this.teachers.filter((t: Teacher) => t.id !== id);
+  };
+
+  public updateTeachersById = (id: string, teachers: Teacher) => {
+    this.teachers = this.teachers.map((t: Teacher) => {
+      if (t.id === id) return teachers;
+      else return t;
+    });
+  };
+
+  public getReminders = (): Reminder[] => this.reminders;
+
+  public getReminderById = (id: string): Reminder => {
+    return this.reminders.filter((r: Reminder) => r.id === id)[0];
+  };
+
+  public deleteReminderById = (id: string) => {
+    this.reminders = this.reminders.filter((r: Reminder) => r.id !== id);
+  };
+
+  public updateReminderById = (id: string, reminders: Reminder) => {
+    this.reminders = this.reminders.map((r: Reminder) => {
+      if (r.id === id) return reminders;
+      else return r;
+    });
+  };
+
+  public setReminder = (reminder: Reminder) => this.reminders.push(reminder);
 }
 
 class Teacher {
   id?: string;
   name: string;
 
-  constructor({ id, name }: { id?: string, name: string }) {
+  constructor({ id, name }: { id?: string; name: string }) {
     this.id = id || uuid();
     this.name = name;
   }
 }
 
-interface IBulletin {
-  readonly id?: string;
-  title: string;
-  value: number;
-  weight: number;
-  type: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-}
-
-class Bulletin implements IBulletin {
-  readonly id?: string;
-  title: string;
-  value: number;
-  weight: number;
-  type: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-
-  constructor({ id, title, value, weight, type, createdAt, updatedAt }: IBulletin) {
-    this.id = id || uuid();
-    this.title = title;
-    this.value = value;
-    this.weight = weight;
-    this.type = type;
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
-  }
-}
-
-interface IUnity {
-  readonly id?: string;
-  title: string;
-  classes?: Class[];
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-}
-
-class Unity implements IUnity {
-  readonly id?: string;
-  title: string;
-  classes: Class[];
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-
-  constructor({ id, title, classes, createdAt, updatedAt }: IUnity) {
-    this.id = id || uuid();
-    this.title = title;
-    this.classes = classes || [];
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
-  }
-
-  public getId = (): string => this.id || '';
-
-  public getClasses = (): Class[] => this.classes;
-
-  public getClassesById = (id: string): Class => {
-    return this.classes.filter((c: Class) => c.id === id)[0];
-  }
-
-  public deleteClassesById = (id: string) => {
-    this.classes = this.classes.filter((c: Class) => c.id !== id);
-  }
-
-  public updateClassesById = (id: string, classes: Class) => {
-
-  }
-
-  public setClasses = (classes: Class) => this.classes.push(classes);
-}
-
-interface IClass {
-  readonly id?: string;
-  title: string;
-  description: string;
-  content: string;
-  quantity: number;
-  date: Date;
-  IWasPresent?: boolean;
-  type?: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-}
-
-class Class implements IClass {
-  readonly id?: string;
-  title: string;
-  description: string;
-  content: string;
-  quantity: number;
-  date: Date;
-  IWasPresent: boolean;
-  type: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-
-  constructor({ id, title, description, content, quantity, date, IWasPresent, type, createdAt, updatedAt }: IClass) {
-    this.id = id || uuid();
-    this.title = title;
-    this.description = description;
-    this.content = content;
-    this.quantity = quantity;
-    this.date = date;
-    this.IWasPresent = IWasPresent || false;
-    this.type = type || 'class';
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
-  }
-
-  public getId = (): string => this.id || '';
-}
-
-interface IEvaluation {
-  readonly id?: string;
-  title: string;
-  description: string;
-  questions: Question[];
-  note?: number;
-  bulletinId?: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-}
-
-class Evaluation implements IEvaluation {
-  readonly id?: string;
-  title: string;
-  description: string;
-  questions: Question[];
-  note?: number;
-  bulletinId?: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-
-  constructor({ id, title, description, questions, note, bulletinId, createdAt, updatedAt }: IEvaluation) {
-    this.id = id || uuid();
-    this.title = title;
-    this.description = description;
-    this.questions = questions || [];
-    this.note = note;
-    this.bulletinId = bulletinId;
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
-  }
-}
-
-interface IQuestion {
-  readonly id?: string;
-  title: string;
-  content: string;
-  value?: number;
-  type: string;
-}
-
-class Question implements IQuestion {
-  readonly id?: string;
-  title: string;
-  content: string;
-  value?: number;
-  type: string;
-
-  constructor({ id, title, content, value, type }: IQuestion) {
-    this.id = id || uuid();
-    this.title = title;
-    this.content = content;
-    this.value = value;
-    this.type = type;
-  }
-}
-
-interface IWork {
-  readonly id?: string;
-  title: string;
-  content: string;
-  note?: number;
-  bulletinId?: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-}
-
-class Work implements IWork {
-  readonly id?: string;
-  title: string;
-  content: string;
-  note?: number;
-  bulletinId?: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-
-  constructor({ id, title, content, note, bulletinId, createdAt, updatedAt }: IWork) {
-    this.id = id || uuid();
-    this.title = title;
-    this.content = content;
-    this.note = note;
-    this.bulletinId = bulletinId;
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
-  }
-}
-
-interface IActivity {
-  readonly id?: string;
-  title: string;
-  description: string;
-  questions: Question[];
-  readonly createdAt?: Date;
-  updatedAt?: Date
-}
-
-class Activity implements IActivity {
-  readonly id?: string;
-  title: string;
-  description: string;
-  questions: Question[];
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-
-  constructor({ id, title, description, questions, createdAt, updatedAt }: IActivity) {
-    this.id = id || uuid();
-    this.title = title;
-    this.description = description;
-    this.questions = questions || [];
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
-  }
-}
-
-interface IResume {
-  readonly id?: string;
-  title: string;
-  content: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-}
-
-class Resume implements IResume {
-  readonly id?: string;
-  title: string;
-  content: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-
-  constructor({ id, title, content, createdAt, updatedAt }: IResume) {
-    this.id = id || uuid();
-    this.title = title;
-    this.content = content;
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
-  }
-}
-
-interface IMedia {
-  readonly id?: string;
-  title: string;
-  link: string;
-  type: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-}
-
-class Media implements IMedia {
-  readonly id?: string;
-  title: string;
-  link: string;
-  type: string;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-
-  constructor({ id, title, link, type, createdAt, updatedAt }: IMedia) {
-    this.id = id || uuid();
-    this.title = title;
-    this.link = link;
-    this.type = type;
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
-  }
-}
-
-interface ITODOs {
-  readonly id?: string;
-  title: string;
-  content: string;
-  status?: string;
-  concludedAt?: Date | null;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-}
-
-class TODOs implements ITODOs {
-  readonly id?: string;
-  title: string;
-  content: string;
-  status: string;
-  concludedAt?: Date | null;
-  readonly createdAt?: Date;
-  updatedAt?: Date;
-
-  constructor({ id, title, content, status, concludedAt, createdAt, updatedAt }: ITODOs) {
-    this.id = id || uuid();
-    this.title = title;
-    this.content = content;
-    this.status = status || 'pending';
-    this.concludedAt = concludedAt || null;
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
-  }
-}
-
-export { Discipline, Teacher, Unity, Class, Evaluation, Bulletin, Question, Work, Activity, Resume, Media, TODOs };
+export { IDiscipline, Discipline, Teacher };

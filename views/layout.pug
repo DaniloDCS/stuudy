@@ -5,26 +5,86 @@ html(lang="en")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(rel="stylesheet", href="/public/css/all.css")
-    script(async, src="/public/js/all.js") 
+    link(rel="stylesheet", href="/public/css/complements.css")
+    script(defer, src="/public/js/all.js") 
+    link(rel="stylesheet", href="/fontawesome/css/all.css")
     title Stuudy | #{title}
-    style. 
-      .links {
+
+    style.
+      .row-content {
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, .1);
         display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        margin: 10px;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
       }
 
-      .links a {
-        margin: 10px;
+      .col-layout-1 {
+        width: 20%;
+        padding: 12px;
+        margin-right: 10px;
       }
 
-  body 
-    .links
-      a(href="/courses") Cursos |
-      a(href="/friends") Friends |
-      a(href="/dashboard") Dashboard |
-      a(href="/admin") Administration |
-      a(href="/support") Suporte |
-      a(href="/authenticate/signout") Sair 
-    block content
+      .col-layout-2 {
+        width: 80%;
+        padding: 12px;
+      }
+
+      @media (max-width: 768px) {
+        .row-content {
+          flex-direction: column;
+        }
+
+        .col-layout-1 {
+          width: 100%;
+        }
+
+        .col-layout-2 {
+          width: 100%;
+        }
+      }
+            
+  body
+    div.content.h-100#theme-current(class=user.theme)  
+      .row-content  
+        .col-layout-1.r-2
+          div 
+            .d-flex.justify-start.align-center
+              img(src=user.avatar, alt=user.name, style="width: 60px; height: 60px; border-radius: 50%; margin: 10px;")
+              .ml-2
+                h3#welcome-message(data-name=user.name)
+                small <i class="fas fa-envelope-open"></i> #{user.email}
+            nav.menu-nav
+              ul.menu-links
+                li.menu-link
+                  a(href="/dashboard") <i class="fas fa-home"></i> Início
+                li.menu-link  
+                  a(href="/me") <i class="fas fa-user"></i> Meu perfil
+                li.menu-link
+                  a(href="/courses") <i class="fas fa-chalkboard"></i> Meus cursos
+                li.menu-link
+                  a(href="/friends") <i class="fas fa-users-line"></i> Amigos
+                li.menu-link 
+                  a(href="/apps") <i class="fas fa-cubes"></i> Aplicativos
+                li.menu-link
+                  a(href="/admin") <i class="fas fa-users-gear"></i> Administração
+                li.menu-link
+                  a(href="/support") <i class="fas fa-envelope-open"></i> Suporte
+                li.menu-link
+                  a.text-red(href="/authenticate/signout") <i class="fas fa-sign-out-alt"></i> Sair
+        .col-layout-2.r-2.overflow-y
+          block content
+  script. 
+    const currentDate = new Date(),
+      welcomeMessageElement = document.querySelector('#welcome-message');
+
+    const user = welcomeMessageElement.dataset.name;
+
+    if (currentDate.getHours() >= 0 && currentDate.getHours() < 12) welcomeMessageElement.innerHTML = '🌞 Bom dia, ';
+    else if (currentDate.getHours() >= 12 && currentDate.getHours() < 18) welcomeMessageElement.innerHTML = '🌤 Boa tarde, ';
+    else welcomeMessageElement.innerHTML = '🌚 Boa noite, ';
+
+    welcomeMessageElement.innerHTML += user.split(' ')[0] + '!';
+
