@@ -1,0 +1,60 @@
+extends ../layout
+block content
+
+  style. 
+    .apps {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: start;
+      padding: 10px;
+    }
+
+    .app {
+      width: 24%;
+      height: 140px;
+      margin: 0.5%;
+      padding: 10px;
+      border: 2px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+    }
+
+    .app-icon {
+      font-size: xx-large;
+      margin-bottom: 10px;
+    }
+
+    .app:hover {
+      text-decoration: none;
+      transform: scale(1.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+  h1 Meus aplicativos 
+
+  .apps 
+    a.app(href="/apps/audio", target="_blank")
+      i.app-icon.fas.fa-headphones
+      h3 Reprodutor 
+      p Reproduza suas músicas favoritas
+
+    a.app(href="/apps/books", target="_blank")
+      i.app-icon.fas.fa-book
+      h3 Leitor de livros 
+      p Leia seus livros favoritos
+
+    a.app(href="/apps/calendar", target="_blank")
+      i.app-icon.fas.fa-calendar-alt
+      h3 Calendário
+      p Gerencie seus eventos
+
+    a.app(href="/apps/rich", target="_blank")
+      i.app-icon.fas.fa-file-word
+      h3 Editor de texto
+      p Crie seus documentos
+      

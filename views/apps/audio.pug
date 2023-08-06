@@ -1,0 +1,94 @@
+extends ../layout
+block content
+  style. 
+    #drop-alert {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 9999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      border: 4px dashed #ccc;
+      border-radius: 20px;
+    }
+
+    #drop-alert h1 {
+      font-size: 2rem;
+      color: #fff;
+      text-align: center;
+    }
+
+  .screen 
+    h3 Ouça áudios e reproduza seus vídeos
+    
+    #drop 
+      h1 Arraste e solte arquivos aqui
+      p ou
+      input(type="file", id="fileElem", multiple="multiple", accept="audio/*,video/*", style="display:none")
+      label(for="fileElem") Selecione arquivos
+
+  #show-file
+
+  #drop-alert 
+    h1 Solte os arquivos aqui
+
+  script. 
+    // arrastar e soltar arquivos no navegador
+
+    const show = document.getElementById('show-file');
+
+    document.body.addEventListener('dragover', function(e) {
+      e.preventDefault();
+
+      document.getElementById('drop-alert').style.display = 'flex';
+
+      e.dataTransfer.dropEffect = 'copy';
+
+    }, false);
+
+    document.body.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+
+      document.getElementById('drop-alert').style.display = 'none';
+
+    }, false);
+
+    document.body.addEventListener('drop', function(e) {
+      e.preventDefault();
+
+      document.getElementById('drop-alert').style.display = 'none';
+
+      var files = e.dataTransfer.files;
+
+      for (var i = 0, f; f = files[i]; i++) {
+        console.log(f);
+
+        const type = f.type.split('/')[0];
+
+        if (type === 'audio' || type === 'video') {
+          const reader = new FileReader();
+
+          reader.onload = function(e) {
+            const src = e.target.result;
+
+            const media = document.createElement(type);
+
+            media.src = src;
+            media.controls = true;
+
+            show.appendChild(media);
+          }
+
+          reader.readAsDataURL(f);
+        }
+        
+      }
+
+
+
+    }, false);

@@ -34,6 +34,7 @@ style.
     border: 1px solid #ccc;
     margin: 0 auto;
     font: 500 12px Arial;
+    overflow: auto;
   }
 
   .rich-content * {
@@ -216,8 +217,7 @@ if (allClasses.length > 2)
         .carousel-item-content
           | !{allClasses[allClasses.length - 1].content}
       .carousel-item-center(data-index="1")
-        .carousel-item-content
-          | !{allClasses[0].content}
+        .carousel-item-content(contenteditable="true") !{allClasses[0].content}z
         .carousel-buttons
           button(data-btn-prev-index=allClasses.length - 1)#preview-prev-class.carousel-button-left Aula anterior
           span(style="flex: 1; text-align: center;")#preview-class-number Aula 1 de #{allClasses.length}
@@ -396,6 +396,9 @@ script.
               margin-left: 10px;
               font-weight: bold;
               z-index: 9999;
+              position: absolute;
+              top: 20px;
+              right: 30px;
               animation: msg 3s ease-in-out;
             `;
 
@@ -405,7 +408,7 @@ script.
               msg.innerHTML = "<i class='fas fa-times-circle'></i> Ocorreu um erro ao salvar as alterações!";
             }
             
-            document.querySelector(".discipline-title").appendChild(msg);
+            document.body.appendChild(msg);
 
             setTimeout(() => {
               msg.remove();

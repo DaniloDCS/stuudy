@@ -4,7 +4,7 @@ div
 
 button(data-btn-modal="new-book") <i class="fas fa-plus"></i> Criar uma nova atividade
 .modal.modal-md(data-modal="new-book")
-  form.modal-content(action="/book/register" method="POST")
+  form.modal-content(action="/book/create" method="POST")
     .modal-header
       span(data-modal-close="new-book") <i class="fas fa-times-circle"></i>
       h3 Criar uma nova atividade
@@ -31,7 +31,7 @@ table
     tr 
       th #{cont++}
       td #{book.title}
-      td #{book.link}
+      td !{book.link}
       td 
         a(href="/disciplines/discipline/" + discipline.id + "/book/" + book.id) Acessar
         a(href="/disciplines/discipline/" + discipline.id + "/book/" + book.id + "/delete")  | Remover

@@ -82,11 +82,21 @@ if (richTexts.length > 0) {
     listOl: () => document.execCommand('insertOrderedList'),
     textAlign: (value) => document.execCommand('justify' + value),
     fontFamily: (value) => document.execCommand('fontName', false, value),
-    fontSize: (value) => document.execCommand('fontSize', false, value),
+    fontSize: (value) => { 
+      document.execCommand("fontSize", false, value);
+      var fontElements = window.getSelection().anchorNode.parentNode
+      fontElements.removeAttribute("size");
+      fontElements.style.fontSize = value + "px";
+    },
     color: (value) => document.execCommand('foreColor', false, value),
     backgroundColor: (value) => document.execCommand('backColor', false, value),
     fontStyle: (value) => document.execCommand('formatBlock', false, value),
-    lineHeight: (value) => document.execCommand('lineHeight', false, value)
+    lineHeight: (value) => {
+      document.execCommand('lineHeight', false, Number(value));
+      var fontElements = window.getSelection().anchorNode.parentNode
+      fontElements.removeAttribute("size");
+      fontElements.style.lineHeight = value;
+    }
   }
 
   function pageControl(e, me, fater){
@@ -101,8 +111,9 @@ if (richTexts.length > 0) {
     // cria uma lisat nao ordenada: ctrl + shift + 8 ou *
     // cria uma lista ordenada: ctrl + shift + 7 ou &
 
-    if (e.ctrlKey && e.shiftKey && key === '*' || key === '&' || key === '8' || key === '7') {
-      const list = key === '*' || key === '8' ? 'ul' : 'ol';
+    const listsKeys = ['Digit8', 'Digit9'];
+    if (e.ctrlKey && e.shiftKey && listsKeys.includes(code)) {
+      const list = code === 'Digit8' ? 'ul' : 'ol';
       if (list === 'ul') document.execCommand('insertUnorderedList');
       else document.execCommand('insertOrderedList');
     }
@@ -130,51 +141,48 @@ if (richTexts.length > 0) {
       document.execCommand('createLink', false, link);
     }
 
-    // remove formatação: ctrl + space
-    if (e.ctrlKey && key === ' ') document.execCommand('removeFormat');
-
-    // cria um novo parágrafo: ctrl + enter
-    if (e.ctrlKey && key === 'Enter') document.execCommand('insertParagraph');
-
-    //ctrl + z, v, y, c, a
-    const selectKeys = ['KeyZ', 'KeyV', 'KeyY', 'KeyC', 'KeyA']
+    const selectKeys = ['KeyZ', 'KeyV', 'KeyY', 'KeyC', 'KeyA', 'KeyI', 'Space', 'Enter']
     if (e.ctrlKey && selectKeys.includes(code)) {
       if (code === 'KeyZ') document.execCommand('undo');
       if (code === 'KeyY') document.execCommand('redo');
       if (code === 'KeyV') document.execCommand('paste', null, null);
       if (code === 'KeyC') document.execCommand('copy');
       if (code === 'KeyA') document.execCommand('selectAll');
+      if (code === 'Space') document.execCommand('removeFormat');
+      if (code === 'Enter') document.execCommand('insertParagraph');
+      if (code === 'KeyI') document.execCommand('italic');
     }
 
     // tab
     if (e.key === 'Tab') {
       e.preventDefault();
 
+      document.execCommand('insertHtml', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
+
       // se for um elemento de lista: ul ou ol
-      if (tag === 'li') {
+      if (tag === 'li' || tag === 'ol') {
+        console.log('lista', tag)
         const list = positon.commonAncestorContainer.parentNode.parentNode.tagName.toLowerCase();
         const level = positon.commonAncestorContainer.parentNode.parentNode.parentNode.tagName.toLowerCase();
+        
         if (list === 'ul') {
           // se for uma lista não ordenada, cria um novo elemento de lista com um tab de distância de acordo com o nível
-          document.execCommand('insertHTML', false, '<li style="margin-left: ' + (level === 'ul' ? '40px' : level === 'ol' ? '80px' : '120px') + ';">&#009</li>');
+          document.execCommand('insertHTML', false, '<li style="margin-left: ' + (level === 'ul' ? '10px' : level === 'ol' ? '20px' : '30px') + ';">&#009</li>');
         }
 
         if (list === 'ol') {
           // se for uma lista ordenada, cria um novo elemento de lista com um tab de distância, de acordo com o nível
-          document.execCommand('insertHTML', false, '<li style="margin-left: ' + (level === 'ul' ? '40px' : level === 'ol' ? '80px' : '120px') + ';">&#009</li>');
+          document.execCommand('insertHTML', false, '<li style="margin-left: ' + (level === 'ul' ? '10px' : level === 'ol' ? '20px' : '30px') + ';">&#009</li>');
         }
 
       } else document.execCommand('insertHTML', false, '&#009');
     }
 
     // Minus e Plus
-    const fontSizeControls = ['-', '='];
-    if (e.ctrlKey && fontSizeControls.includes(key)) {
-      if (key === '-') {
-        document.execCommand('decreaseFontSize', false, true);
-      } else {
-        document.execCommand('incraseFontSize', false, true);
-      }
+    const fontSizeControls = ['Equal', 'Minus'];
+    if (e.ctrlKey && e.shiftKey && fontSizeControls.includes(code)) {
+      if (key === 'Equal') document.execCommand('decreaseFontSize', false, true);
+      else document.execCommand('incraseFontSize', false, true);
     }
 
     // add imagem: ctrl + alt + i
@@ -189,6 +197,7 @@ if (richTexts.length > 0) {
       e.preventDefault();
       const rows = prompt('Digite o número de linhas: '),
         cols = prompt('Digite o número de colunas: ');
+
       document.execCommand('insertHTML', false, `<table style="width: 100%; border-collapse: collapse; border: 1px solid #ccc;">${'<tr>' + '<td style="border: 1px solid #ccc; padding: 5px;">' + '</td>'.repeat(cols) + '</tr>'.repeat(rows)}</table>`);
     }
   }
@@ -303,8 +312,24 @@ if (richTexts.length > 0) {
           { tag: "option", attributes: { value: "Verdana" }, othersAttributes: { innerText: "Verdana" } },
         ]
       }, {
-        tag: "input",
-        attributes: { type: "number", class: "rich-text-font-size", value: "12", "data-rich-font-size": richData }
+        tag: "select",
+        attributes: { class: "rich-text-font-size", "data-rich-font-size": richData },
+        childs: [
+          { tag: "option", attributes: { value: "8" }, othersAttributes: { innerText: "8" } },
+          { tag: "option", attributes: { value: "9" }, othersAttributes: { innerText: "9" } },
+          { tag: "option", attributes: { value: "10" }, othersAttributes: { innerText: "10" } },
+          { tag: "option", attributes: { value: "11" }, othersAttributes: { innerText: "11" } },
+          { tag: "option", attributes: { value: "12", selected: "selected" }, othersAttributes: { innerText: "12" } },
+          { tag: "option", attributes: { value: "14" }, othersAttributes: { innerText: "14" } },
+          { tag: "option", attributes: { value: "18" }, othersAttributes: { innerText: "18" } },
+          { tag: "option", attributes: { value: "24" }, othersAttributes: { innerText: "24" } },
+          { tag: "option", attributes: { value: "30" }, othersAttributes: { innerText: "30" } },
+          { tag: "option", attributes: { value: "36" }, othersAttributes: { innerText: "36" } },
+          { tag: "option", attributes: { value: "48" }, othersAttributes: { innerText: "48" } },
+          { tag: "option", attributes: { value: "60" }, othersAttributes: { innerText: "60" } },
+          { tag: "option", attributes: { value: "72" }, othersAttributes: { innerText: "72" } },
+          { tag: "option", attributes: { value: "96" }, othersAttributes: { innerText: "96" } },
+        ]
       }, {
         tag: "select",
         attributes: { class: "rich-text-line-height", "data-rich-line-height": richData },
@@ -319,20 +344,28 @@ if (richTexts.length > 0) {
         ]
       }, {
         tag: "button",
-        attributes: { class: "rich-text-bold", "data-rich-bold": richData },
+        attributes: { type: "button", class: "rich-text-bold", "data-rich-bold": richData },
         othersAttributes: { innerHTML: '<i class="fas fa-bold"></i>' }
       }, {
         tag: "button",
-        attributes: { class: "rich-text-italic", "data-rich-italic": richData },
+        attributes: { type: "button", class: "rich-text-italic", "data-rich-italic": richData },
         othersAttributes: { innerHTML: '<i class="fas fa-italic"></i>' }
       }, {
         tag: "button",
-        attributes: { class: "rich-text-underline", "data-rich-underline": richData },
+        attributes: { type: "button", class: "rich-text-underline", "data-rich-underline": richData },
         othersAttributes: { innerHTML: '<i class="fas fa-underline"></i>' }
       }, {
         tag: "button",
-        attributes: { class: "rich-text-strike", "data-rich-strike": richData },
+        attributes: { type: "button", class: "rich-text-strike", "data-rich-strike": richData },
         othersAttributes: { innerHTML: '<i class="fas fa-strikethrough"></i>' }
+      }, {
+        tag: "button",
+        attributes: { type: "button", class: "rich-text-list", "data-rich-list": richData },
+        othersAttributes: { innerHTML: '<i class="fas fa-list"></i>' }
+      }, {
+        tag: "button",
+        attributes: { type: "button", class: "rich-text-list-ol", "data-rich-list-ol": richData },
+        othersAttributes: { innerHTML: '<i class="fas fa-list-ol"></i>' }
       }, {
         tag: "input",
         attributes: { type: "color", value: "#000000", "data-rich-color": richData }
@@ -348,14 +381,6 @@ if (richTexts.length > 0) {
           { tag: "option", attributes: { value: "right" }, othersAttributes: { innerText: "Direita" } },
           { tag: "option", attributes: { value: "justify" }, othersAttributes: { innerText: "Justificado" } },
         ]
-      }, {
-        tag: "button",
-        attributes: { class: "rich-text-list", "data-rich-list": richData },
-        othersAttributes: { innerHTML: '<i class="fas fa-list"></i>' }
-      }, {
-        tag: "button",
-        attributes: { class: "rich-text-list-ol", "data-rich-list-ol": richData },
-        othersAttributes: { innerHTML: '<i class="fas fa-list-ol"></i>' }
       }
     ]);
 
