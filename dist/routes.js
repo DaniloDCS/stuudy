@@ -21,6 +21,7 @@ var _bookroutes = require('./routes/book.routes'); var _bookroutes2 = _interopRe
 var _resumeroutes = require('./routes/resume.routes'); var _resumeroutes2 = _interopRequireDefault(_resumeroutes);
 var _reminderroutes = require('./routes/reminder.routes'); var _reminderroutes2 = _interopRequireDefault(_reminderroutes);
 var _todoroutes = require('./routes/todo.routes'); var _todoroutes2 = _interopRequireDefault(_todoroutes);
+var _docroutes = require('./routes/doc.routes'); var _docroutes2 = _interopRequireDefault(_docroutes);
 
 var _authenticate = require('./database/authenticate');
 var _User = require('./models/User');
@@ -71,6 +72,7 @@ class Routes {
     this.router.use("/resume", auth, _resumeroutes2.default);
     this.router.use("/reminder", auth, _reminderroutes2.default);
     this.router.use("/TODO", auth, _todoroutes2.default);
+    this.router.use("/docs", auth, _docroutes2.default); 
 
     this.router.post("/search", auth, async (req, res) => {
       const { search } = req.body;
