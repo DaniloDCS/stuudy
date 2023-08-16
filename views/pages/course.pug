@@ -1,0 +1,237 @@
+extends ../layout
+block content
+
+  style. 
+    .periods {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: start;
+      padding: 10px;
+    }
+
+    .period {
+      width: 19%;
+      margin: 0.5%;
+      padding: 10px;
+      border: 2px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-radius: 20px;
+    }
+
+    .period-icon {
+      font-size: xx-large;
+      margin-bottom: 10px;
+    }
+
+    .period:hover {
+      text-decoration: none;
+      transform: scale(1.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+  a(href="/courses") <i class="fas fa-arrow-left"></i> Voltar para cursos
+
+  h3 #{course.icon}| #{course.name}
+  h4 #{course.description}
+  br
+  br
+
+  // buscar livro ou aulas
+  div
+    input(type="text", name="search", id="search-result")
+    button(type="button") Buscar livro ou aulas
+
+  #result-search
+
+  button(data-btn-modal="finish-course") <i class="fas fa-check-circle"></i> Concluir curso
+  .modal.modal-md(data-modal="finish-course")
+    .modal-content
+      .modal-header
+        span(data-modal-close="finish-course") <i class="fas fa-times-circle"></i>
+        h3 Você tem certeza disso?
+      .modal-body
+        p Você tem certeza que deseja concluir o curso: <strong> #{course.name.toUpperCase()} </strong>?
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="finish-course", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        a.modal-btn-ok(href="/course/conclude") <i class="fas fa-check-circle"></i> Concluir
+
+  button(data-btn-modal="delete-course") <i class="fas fa-trash-alt"></i> Excluir curso
+  .modal.modal-md(data-modal="delete-course")
+    .modal-content
+      .modal-header
+        span(data-modal-close="delete-course") <i class="fas fa-times-circle"></i>
+        h3 Você tem certeza disso?
+      .modal-body
+        p Você tem certeza que deseja excluir o curso <strong> #{course.name.toUpperCase()} </strong>? A ação não poderá ser desfeita.
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="delete-course", type="button") <i class="fas fa-times-circle"></i> Não, cancelar 
+        a.modal-btn-ok(href="/course/delete") <i class="fas fa-check-circle"></i> Sim, excluir
+
+  button(data-btn-modal="update-course") <i class="fas fa-sync-alt"></i> Atualizar curso
+  .modal.modal-md(data-modal="update-course")
+    form.modal-content(action="/course/update" method="POST")
+      .modal-header
+        span(data-modal-close="update-course") <i class="fas fa-times-circle"></i>
+        h3 Editar curso: #{course.name.toUpperCase()}
+      .modal-body
+        div   
+          label(for="name") Nome do curso
+          input(type="text" name="name" id="name", value=course.name)
+        div
+          label(for="icon") Ícone do curso
+          input(type="text" name="icon" id="icon", value=course.icon)
+        div
+          label(for="description") Descrição do curso
+          input(type="text" name="description" id="description", value=course.description)
+        div
+          label(for="university") Universidade
+          input(type="text" name="university" id="university", value=course.university)
+        div
+          label(for="location") Localização
+          input(type="text" name="location" id="location", value=course.location)
+        div
+          label(for="status") Status
+          select(name="status" id="status")
+            option(value="studying") Estudando
+            option(value="concluded") Concluído
+            option(value="dropped") Abandonado
+            option(value="cancelled") Cancelado
+            option(value="failed") Reprovado
+            option(value="waiting") Aguardando
+        div
+          label(for="level") Nível
+          input(type="text" name="level" id="level", value=course.level)
+        div
+          label(for="type") Tipo
+          input(type="text" name="type" id="type", value=course.type)
+        div
+          label(for="startedIn") Início
+          input(type="date" name="startedIn" id="startedIn", value=course.startedIn)
+        div
+          label(for="finishedIn") Término
+          input(type="date" name="finishedIn" id="finishedIn", value=course.finishedIn)
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="update-course", type="button") <i class="fas fa-times-circle"></i> Não, cancelar 
+        button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Sim, atualizar
+      
+  table 
+    tr
+      each key in Object.keys(course.dados)
+        th= key
+    tr
+      each value in Object.values(course.dados)
+        td= value
+
+  br
+  - let listOfDisciplines = []
+  
+  h4 Períodos 
+  if !course.periods.length
+    p Nenhum período encontrado
+  else
+    .periods
+        each period in course.periods.reverse()
+          each discipline in period.disciplines
+            - listOfDisciplines.push({ name: discipline.name, media: discipline.media, icon: discipline.icon, period: period.name })
+          a.period(href="/period/p/" + period.id)
+            span.period-icon #{period.icon}
+            span #{period.name}
+            span #{period.status}
+
+  button(data-btn-modal="modal-register-period") <i class="fas fa-plus-circle"></i> Registrar um novo período
+  .modal(data-modal="modal-register-period")
+    form.modal-content(action="/period/register" method="POST")
+      .modal-header
+        span(data-modal-close="modal-register-period") <i class="fas fa-times-circle"></i>
+        h3 Registrar um novo período
+      .modal-body
+        div   
+          label(for="name") Nome do período
+          input(type="text" name="name" id="name")
+        div
+          label(for="status") Status
+          select(name="status" id="status")
+            option(value="studying") Estudando
+            option(value="concluded") Concluído
+            option(value="dropped") Abandonado
+            option(value="cancelled") Cancelado
+            option(value="wating") Aguardando
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="modal-register-period", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+
+  button(data-btn-modal="modal-ranking") <i class="fas fa-sort-numeric-down"></i> Ranking de disciplinas
+  .modal.modal-lg(data-modal="modal-ranking")
+    .modal-content
+      .modal-header
+        span(data-modal-close="modal-ranking") <i class="fas fa-times-circle"></i>
+        h3 Ranking de disciplinas
+      .modal-body
+        ul  
+          each discipline in listOfDisciplines.sort((a, b) => b.media - a.media || a.name.localeCompare(b.name))
+            li #{discipline.icon} | #{discipline.period} | #{discipline.name} | #{discipline.media}
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="modal-ranking") <i class="fas fa-times-circle"></i> Cancelar
+
+  script. 
+    const search = document.querySelector('#search-result'),
+      result = document.querySelector('#result-search');
+    
+    if (search){
+      search.addEventListener('keyup', (e) => {
+        if (e.keyCode === 13) {
+          fetch('/search', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              search: search.value
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+
+            if (data.classes.length > 0){
+              result.innerHTML = '';
+              data.classes.forEach((item) => {
+                result.innerHTML += `
+                  <div>
+                    <h4>${item.title}</h4>
+                    <p>${item.content}</p>
+                    <a href="/result/class/${item.courseId}/${item.periodId}/${item.disciplineId}/${item.unityId}/${item.id}">Acessar</a>
+                  </div>
+                `;
+              })
+            } else if (data.books.length > 0) {
+              result.innerHTML = '';
+              data.books.forEach((item) => {
+                result.innerHTML += `
+                  <div>
+                    <h4>${item.title}</h4>
+                    <p>${item.link}</p>
+                    <a href="/result/book/${item.id}">Acessar</a>
+                  </div>
+                `;
+              })
+            } else {
+              result.innerHTML = '<p>Nenhum resultado encontrado</p>';
+            }
+          })
+        }
+      })
+    }
+
+    const periods = document.querySelectorAll('.period');
+    const backgrounds = ["bg-blue", "bg-red", "bg-green", "bg-yellow", "bg-purple", "bg-white", "bg-gray", "bg-black", "bg-brown", "bg-orange", "bg-pink", "bg-cyan", "bg-indigo", "bg-teal", "bg-lime", "bg-amber"];  
+
+    function random(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    if (periods) periods.forEach(period => period.classList.add(backgrounds[random(0, backgrounds.length - 1)]));

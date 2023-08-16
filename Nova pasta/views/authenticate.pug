@@ -1,0 +1,143 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="/public/css/all.css")
+    link(rel="stylesheet", href="/public/css/complements.css")
+    script(async, src="/public/js/all.js") 
+    link(rel="stylesheet", href="/fontawesome/css/all.css")
+    title Stuudy | #{title}
+    style. 
+      .menu-nav {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 8px 5px;
+      }
+
+      .menu-nav .menu-links {
+        width: fit-content;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        list-style: none;
+      }
+
+      .menu-nav .menu-links .menu-link {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+      }
+
+      .menu-nav .menu-links .menu-link:not(:last-child) {
+        margin-right: 10px;
+      }
+
+      .menu-nav .menu-links .menu-link:hover {
+        background-color: #f1f1f1;
+      }
+
+      .menu-nav .menu-links .menu-link a {
+        text-decoration: none;
+        color: #000;
+        font-weight: 500;
+        font-size: 20px;
+      }
+
+      .menu-nav .menu-links .menu-link a i {
+        margin-right: 5px;
+      }
+
+      .menu-nav .menu-links .link-red {
+        color: red;
+      }
+
+      .menu-nav .menu-links .link-red:hover {
+        background-color: red;
+        color: #fff;
+      }
+
+      .menu-nav .menu-links .link-red a {
+        color: ineherit;
+      }
+
+  body
+    .content.d-flex.justify-center.align-center
+      .row.w-100.align-center.justify-center
+        .col-sm-12.col-md-8.col-lg-6.col-xl-5.bg-white.p-4.r-2  
+          h2 Boas vindas ao <strong class="text-green">Stuudy</strong>
+          form(action="/authenticate/signin", method="post").mt-5
+            div.form-item
+              label(for="email") <i class="fas fa-user"></i> Username ou email
+              input(type="text", name="email", required="required", id="email")
+            div.form-item
+              label(for="password") <i class="fas fa-lock"></i> Senha
+              input(type="password", name="password", required="required", id="password")
+            div.form-item
+              button.w-100.btn-green(type="submit") Fazer login <i class="fas fa-sign-in-alt"></i>
+            .mt-2.d-flex.align-center.justify-between
+              hr.mb-2
+              button.btn-red.w-50(data-btn-modal="register", type="button") Registre-se <i class="fas fa-user-plus"></i>
+              button.btn-blue.w-50.ml-1(data-btn-modal="forgot", type="button") Esqueci a senha <i class="fas fa-key"></i>
+  
+  .modal(data-modal="register")
+    form.modal-content(action="/authenticate/signup" method="POST" enctype="multipart/form-data")
+      .modal-header
+        span(data-modal-close="register") <i class="fas fa-times-circle"></i>
+        h3 Criar uma nova conta
+      .modal-body
+        .form-item
+          label(for="name-singup") <i class="fas fa-user"></i> Nome
+          input(type="text", name="name", required="required", id="name-singup")
+        .form-item
+          label(for="username-singup") <i class="fas fa-at"></i> Username
+          input(type="text", name="username", required="required", id="username-singup")
+        .form-item
+          label(for="email-singup") <i class="fas fa-envelope"></i> Email
+          input(type="email", name="email", required="required", id="email-singup")
+        .form-item
+          label(for="phone-singup") <i class="fas fa-phone"></i> Phone
+          input(type="phone", name="phone", required="required", id="phone-singup")
+        .form-item
+          label(for="password-singup") <i class="fas fa-lock"></i> Senha
+          input(type="password", name="password", required="required", id="password-singup")
+        .form-item
+          label(for="file-singup") <i class="fas fa-image"></i> Avatar
+          input(type="file", name="avatar", accept="image/*" required="required", id="file-singup")        
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="register", type="button") <i class="fas fa-times-circle"></i> Cancelar meu registro
+        button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar meu registro
+
+  .modal(data-modal="forgot")
+    form.modal-content(action="/period/register" method="POST")
+      .modal-header
+        span(data-modal-close="forgot") <i class="fas fa-times-circle"></i>
+        h3 Esqueci a senha
+      .modal-body
+        .form-item
+          label(for="email-forgot") <i class="fas fa-envelope"></i> Email
+          input(type="email", name="email", required="required", id="email-forgot")
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="forgot", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        button.modal-btn-ok.ml-1(type="submit") <i class="fas fa-check-circle"></i> Redefinir minha senha
+
+script. 
+  const themes = ["theme-blue", "theme-red", "theme-green", "theme-yellow", "theme-purple", "theme-white", "theme-gray", "theme-black", "theme-brown", "theme-orange", "theme-pink", "theme-cyan", "theme-indigo", "theme-teal", "theme-lime", "theme-amber"];
+  let current = 1;
+
+  const body = document.querySelector("body");
+  const btn = document.querySelector("#btn-theme");
+
+  body.className = themes[current];
+
+  btn.addEventListener("click", () => {
+    if (current === themes.length - 1) current = 0;
+    else current++;
+
+    body.className = themes[current];
+  });

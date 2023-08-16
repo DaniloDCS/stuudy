@@ -1,0 +1,74 @@
+extends ../layout
+block content
+  style. 
+    .docs {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .doc {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 49%;
+      margin: 0.5%;
+      margin-bottom: 1rem;
+      text-decoration: none;
+      color: white;
+    }
+
+    .doc:hover {
+      tarnsition: 0.5s;
+      transform: scale(1.1);
+    }
+
+    .doc-icon {
+      font-size: 1.5rem;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 1rem;
+    }
+
+    .doc-icon:hover i {
+      color: #fff;
+    }
+
+    .doc-title {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .doc-last-edit {
+      margin-left: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+  h1 Meus arquivos
+  form(method="GET", action="/docs/new")
+    button(type="submit") Criar um novo documento 
+
+  if !docs.length > 0
+    p Não há documentos
+  else
+    .docs
+      each doc in docs
+        a.doc(href=`/docs/get/${doc.id}`)
+          .doc-icon <i class="fas fa-file-alt"></i>
+          .doc-title #{doc.title}
+          small.doc-last-edit Ultima edição em #{new Date(doc.updatedAt).toLocaleString("pt-BR", {timeZone: "America/Sao_Paulo"})}

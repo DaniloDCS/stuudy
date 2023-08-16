@@ -1,0 +1,297 @@
+extends ../layout
+block content
+
+  style. 
+    .bulletins {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .bulletin {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid black;
+      padding: 10px;
+      margin: 10px;
+    }
+
+    .folder-menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid black;
+      padding: 10px;
+      margin: 10px;
+    }
+
+    .folder-head {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid black;
+      padding: 10px;
+      margin: 10px;
+    }
+
+    .folder-option {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .folder-option.selected {
+      background-color: #ccc;
+    }
+
+    .folder-option .folder-name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .folder-option label.quantity {
+      background-color: blue;
+      border-radius: 50%;
+      padding: 5px;
+      margin-left: 5px;
+      color: white;
+      font-weigth: 600;
+    }
+
+    .folder-icon {
+      margin-right: 10px;
+    }
+
+    .folder-body {
+      width: 100%;
+      border: 1px solid black;
+      padding: 10px;
+      margin: 10px;
+    }
+
+    .folder-body .folder-item {
+      display: none;
+      padding: 10px;
+      margin: 10px;
+    }
+
+    .folder-body .folder-item.selected {
+      display: block;
+    }
+
+    .folder-body .folder-icon {
+      margin-right: 10px;
+    }
+
+    .discipline-title {
+      padding: 10px;
+      margin: 10px;
+    }  
+  //textarea(name="", cols="30", rows="10") #{JSON.stringify(discipline, null, 2)}
+  
+  a(href="/period") <i class="fas fa-arrow-left"></i> Voltar para períodos
+
+  h1.discipline-title #{discipline.icon} | #{discipline.name}
+
+  button(data-btn-modal="remove-discipline") <i class="fas fa-trash-alt"></i> Excluir disciplina
+  .modal.modal-md(data-modal="remove-discipline")
+    .modal-content
+      .modal-header
+        span(data-modal-close="remove-discipline") <i class="fas fa-times-circle"></i>
+        h3 Você tem certeza disso?
+      .modal-body
+        p Você tem certeza que deseja excluir a disciplina: <strong> #{discipline.name.toUpperCase()} </strong>? A ação não poderá ser desfeita.
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="remove-discipline", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        a.modal-btn-ok(href="/discipline/delete") <i class="fas fa-check-circle"></i> Excluir
+
+  button(data-btn-modal="finish-discipline") <i class="fas fa-check-circle"></i> Concluir disciplina
+  .modal.modal-md(data-modal="finish-discipline")
+    .modal-content
+      .modal-header
+        span(data-modal-close="finish-discipline") <i class="fas fa-times-circle"></i>
+        h3 Você tem certeza disso?
+      .modal-body
+        p Você tem certeza que deseja concluir a disciplina: <strong> #{discipline.name.toUpperCase()} </strong>?
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="finish-discipline", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        a.modal-btn-ok(href="/discipline/conclude") <i class="fas fa-check-circle"></i> Concluir
+
+  button(data-btn-modal="edit-discipline") <i class="fas fa-sync-alt"></i> Editar disciplina
+  .modal.modal-lg(data-modal="edit-discipline")
+    form.modal-content(action="/discipline/update" method="POST")
+      .modal-header
+        span(data-modal-close="edit-discipline") <i class="fas fa-times-circle"></i>
+        h3 Editar disciplina
+      .modal-body
+        div   
+          label(for="name") Nome da disciplina
+          input(type="text" name="name" id="name", value=discipline.name)
+        div
+          label(for="icon") Ícone
+          input(type="text" name="icon" id="icon", value=discipline.icon)
+        div 
+          label(for="workload") Carga horária
+          input(type="number" name="workload" id="workload", value=discipline.workload)
+        div   
+          label(for="credits") Créditos
+          input(type="number" name="credits" id="credits", value=discipline.credits)
+        div 
+          label(for="code") Código
+          input(type="text" name="code" id="code", value=discipline.code)
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="edit-discipline", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+
+  .folder-menu 
+    .folder-head
+      .folder-option(data-folder-button="item-0")
+        .folder-icon <i class="fas fa-folder-open"></i>
+        .folder-name Informações da disciplina 
+      .folder-option.selected(data-folder-button="item-1")
+        .folder-icon <i class="fas fa-folder"></i>
+        .folder-name Aulas 
+        label.quantity #{discipline.unities.reduce((acc, unity) => acc + unity.classes.length, 0)}
+      .folder-option(data-folder-button="item-2")
+        .folder-icon <i class="fas fa-award"></i>
+        .folder-name Boletins
+      .folder-option(data-folder-button="item-3")
+        .folder-icon <i class="fas fa-file-signature"></i>
+        .folder-name Provas 
+        label.quantity #{discipline.evaluations.length}
+      .folder-option(data-folder-button="item-4")
+        .folder-icon <i class="fas fa-briefcase"></i>
+        .folder-name Trabalhos 
+        label.quantity #{discipline.workers.length}
+      .folder-option(data-folder-button="item-5")
+        .folder-icon <i class="fas fa-file-alt"></i>
+        .folder-name Resumos 
+        label.quantity #{discipline.resumes.length}
+      .folder-option(data-folder-button="item-6")
+        .folder-icon <i class="fas fa-book"></i>
+        .folder-name Livros 
+        label.quantity #{discipline.books.length}
+      .folder-option(data-folder-button="item-7")
+        .folder-icon <i class="fas fa-bell"></i>
+        .folder-name Lembretes 
+        label.quantity #{discipline.reminders.length}
+      .folder-option(data-folder-button="item-8")
+        .folder-icon <i class="fas fa-list-check"></i>
+        .folder-name Atividades 
+        label.quantity #{discipline.activities.length}
+      .folder-option(data-folder-button="item-9")
+        .folder-icon <i class="fas fa-list"></i>
+        .folder-name Tarefas 
+        label.quantity #{discipline.TODOs.length}
+
+    .folder-body
+      .folder-item(data-folder-item="item-0")
+        include ./info.pug
+      .folder-item.selected(data-folder-item="item-1")
+        include ./classes.pug
+      .folder-item(data-folder-item="item-2")
+        include ./bulletins.pug
+      .folder-item(data-folder-item="item-3")
+        include ./evaluations.pug
+      .folder-item(data-folder-item="item-4")
+        include ./workers.pug
+      .folder-item(data-folder-item="item-5")
+        include ./resumes.pug
+      .folder-item(data-folder-item="item-6")
+        include ./books.pug
+      .folder-item(data-folder-item="item-7")
+        include ./reminders.pug
+      .folder-item(data-folder-item="item-8")
+        include ./activities.pug
+      .folder-item(data-folder-item="item-9")
+        include ./TODOs.pug
+
+  
+  script. 
+    const removeNote = (e) => e.parentNode.remove();
+
+    let quantity = document.querySelectorAll('.bulletin').length - 2;
+
+    function addNote() {
+      quantity += 1;
+      const bulletins = document.querySelector('#bulletins')
+      const bulletin = document.createElement('div')
+
+      bulletin.innerHTML = `
+        <div class="bulletin">
+          <input type="text" value="Avaliação ${bulletins.children.length - 3}" readonly name="avaliation${quantity}[title]" required>
+          <p>Nota</p>
+          <input type="number" value="" name="avaliation${quantity}[value]" min="0" max="10" step="0.1" required>
+          <p>Peso</p>
+          <input type="number" value="1" name="avaliation${quantity}[weight]" min="0" max="10" step="0.1" required>
+          <p>Tipo</p>
+          <input type="text" value="evaluation" readonly name="avaliation${quantity}[type]" required>
+        </div>
+        <button type="button" onclick="removeNote(this)">Remover</button>
+      `
+      
+      // adicionar o elemento criado ao bulletins, 2 filhos antes
+      bulletins.insertBefore(bulletin, bulletins.children[bulletins.children.length - 4])      
+    }
+
+    const date = new Date();
+    document.querySelector("#date").value = new Date().toLocaleDateString("en-ca");
+
+    function createQuestion(){
+      const questions = document.querySelector('#questions')
+      const question = document.createElement('div')
+
+      question.innerHTML = `
+        <div class="question">
+          <input type="text" value="Questão ${questions.children.length}" readonly name="question${questions.children.length}[title]" required>
+          <p>Conteúdo</p>
+          <input type="text" value="" name="question${questions.children.length}[content]" required>
+          <p>Valor</p>
+          <input type="number" value="1" name="question${questions.children.length}[value]" min="0" max="10" step="0.1" required>
+          <p>Tipo</p>
+          <input type="text" value="question" readonly name="question${questions.children.length}[type]" required>
+        </div>
+        <button type="button" onclick="removeQuestion(this)">Remover</button>
+      `
+
+      // adicionar o elemento criado ao bulletins, 1 filhos antes
+      questions.insertBefore(question, questions.children[questions.children.length - 1])
+    }
+
+    document.querySelectorAll('.folder-option').forEach((option) => {
+      option.addEventListener('click', (e) => {
+        const button = option.dataset.folderButton;
+        const item = document.querySelector(`[data-folder-item="${button}"]`);
+
+        document.querySelectorAll('.folder-option').forEach((option) => {
+          option.classList.remove('selected');
+        })
+
+        document.querySelectorAll('.folder-item').forEach((item) => {
+          item.classList.remove('selected');
+        })
+
+        option.classList.add('selected');
+        item.classList.add('selected');
+
+        // mudar o hash da url, sem recarregar a página
+        history.pushState(null, null, `#${button}`);
+      })
+    })
+
+    if (location.hash) {
+      const button = location.hash.replace('#', '');
+      document.querySelector(`[data-folder-button="${button}"]`).click();
+    }
+
+    // quando recarrergar a página, manter a aba selecionada
+
+    window.addEventListener('hashchange', () => {
+      const button = location.hash.replace('#', '');
+      document.querySelector(`[data-folder-button="${button}"]`).click();
+    })

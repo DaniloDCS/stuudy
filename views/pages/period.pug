@@ -1,0 +1,229 @@
+extends ../layout
+block content
+
+  style. 
+    .disciplines {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .disciplines .discipline {
+      width: 48%;
+      height: 100px;
+      margin: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid #ccc;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-betwen;
+      border-radius: 20px;
+      padding: 10px 15px;
+      color: black;
+    }
+
+    .disciplines .discipline:hover {
+      transform: scale(1.05);
+      transition: all 0.3s ease;   
+      text-decoration: none;
+    }
+
+    .discipline .discipline-icon {
+      width: 80px;
+      height: 60px;
+      background-color: rgba(250, 250, 250, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      font-size: xx-large;
+    }
+
+    .discipline-details {
+      width: 100%;
+      padding: 10px;
+      color: white;
+    }
+
+    .discipline-progress {
+      width: 100%;
+      height: 15px;
+      border-radius: 20px;
+      background-color: #ccc;
+      margin: 6px 0;
+    }
+
+    .discipline-progress-bar {
+      height: 100%;
+      background-color: blue;
+      border-radius: 20px;
+      min-width: fit-content;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      color: white;
+      font-weigth: bold;
+      font-size: x-small;
+      padding: 0 5px;
+    }
+
+
+  a(href="/course/c/" + course.id) Voltar para periods
+  h1 !{period.icon}| #{period.name}
+
+  button(data-btn-modal="delete-period") <i class="fas fa-trash-alt"></i> Excluir período
+  .modal.modal-md(data-modal="delete-period")
+    .modal-content
+      .modal-header
+        span(data-modal-close="delete-period") <i class="fas fa-times-circle"></i>
+        h3 Você tem certeza disso?
+      .modal-body
+        p Você tem certeza que deseja excluir o período <strong> #{period.name.toUpperCase()} </strong>? A ação não poderá ser desfeita.
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="delete-period", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        a.modal-btn-ok(href="/period/delete") <i class="fas fa-check-circle"></i> Excluir
+
+  button(data-btn-modal="finish-period") <i class="fas fa-check-circle"></i> Concluir período
+  .modal.modal-md(data-modal="finish-period")
+    .modal-content
+      .modal-header
+        span(data-modal-close="finish-period") <i class="fas fa-times-circle"></i>
+        h3 Você tem certeza disso?
+      .modal-body
+        p Você tem certeza que deseja concluir o período <strong> #{period.name.toUpperCase()} </strong>?
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="finish-period", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        a.modal-btn-ok(href="/period/conclude") <i class="fas fa-check-circle"></i> Concluir
+    
+  button(data-btn-modal="edit-period") <i class="fas fa-sync-alt"></i> Editar período
+  .modal.modal-lg(data-modal="edit-period")
+    form.modal-content(action="/period/update" method="POST")
+      .modal-header
+        span(data-modal-close="edit-period") <i class="fas fa-times-circle"></i>
+        h3 Editar período
+      .modal-body
+        div   
+          label(for="name") Nome do período
+          input(type="text" name="name" id="name", value=period.name)
+        div
+          label(for="icon") Ícone
+          input(type="text" name="icon" id="icon", value=period.icon)
+        div
+          label(for="status") Status
+          select(name="status" id="status")
+            option(value="studying") Estudando
+            option(value="concluded") Concluído
+            option(value="dropped") Abandonado
+            option(value="cancelled") Cancelado
+            option(value="failed") Reprovado
+            option(value="waiting") Aguardando
+      .modal-footer
+        button.modal-btn-cancel(data-modal-close="edit-period", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+
+  h2 Suas disciplinas
+  if !period.disciplines.length
+    p Nenhuma disciplina encontrada
+  else
+    .disciplines
+      each discipline, index in period.disciplines
+        a.discipline(href="/discipline/d/" + discipline.id + "/#item=1")
+          .discipline-icon #{discipline.icon}
+          .discipline-details
+            .discipline-title #{discipline.name}
+            small <i class="fas fa-clock"></i> #{discipline.workload} horas | <i class="fas fa-award"></i> #{discipline.credits} créditos
+            .discipline-progress  
+              .discipline-progress-bar(style=`width: ${discipline.progress}%`) #{discipline.progress}%
+        
+  button(data-btn-modal="modal-register-discipline") <i class="fas fa-folder-plus"></i> Registrar uma nova disciplina
+  .modal.modal-lg(data-modal="modal-register-discipline")
+    form.modal-content(action="/discipline/register" method="POST")
+      .modal-header
+        span(data-modal-close="modal-register-discipline") <i class="fas fa-times-circle"></i>
+        h3 Registrar uma nova disciplina
+      .modal-body
+        .form-item   
+          label(for="name") <i class="fas fa-book"></i> Nome da disciplina
+          input(type="text" name="name" id="name")
+        .form-item
+          label(for="icon") <i class="fas fa-icons"></i> Ícone
+          input(type="text" name="icon" id="icon", value="📚")
+        .form-item
+          label(for="code") <i class="fas fa-barcode"></i> Código
+          input(type="text" name="code" id="code")
+        .form-item
+          label(for="description") <i class="fas fa-align-left"></i> Descrição
+          input(type="text" name="description" id="description")
+        .form-item
+          label(for="status") <i class="fas fa-info-circle"></i> Status
+          select(name="status" id="status")
+            option(value="studying") Estudando
+            option(value="concluded") Concluído
+            option(value="dropped") Abandonado
+            option(value="cancelled") Cancelado
+            option(value="failed") Reprovado
+            option(value="waiting", selected) Aguardando
+        .form-item 
+          label(for="workload") <i class="fas fa-clock"></i> Carga horária
+          input(type="number" name="workload" id="workload")
+        .form-item 
+          label(for="credits") <i class="fas fa-award"></i> Créditos
+          input(type="number" name="credits" id="credits")
+        #teachers 
+          label(for="teachers") <i class="fas fa-chalkboard-teacher"></i> Professores
+          .teacher.d-flex.p-2  
+            input(type="text" name="teachers[]" id="teachers")
+            button(type="button" onclick="removeTeacher(this)") <i class="fas fa-trash-alt"></i> Remover professor
+      .modal-footer
+        button(type="button" onclick="addTeacher()") <i class="fas fa-plus"></i> Adicionar professor
+        button.modal-btn-cancel(data-modal-close="modal-register-discipline", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+        button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+
+  script. 
+    function addTeacher() {
+      const teachers = document.querySelector('#teachers');
+      const div = document.createElement('div');
+      div.classList.add('teacher');
+      div.classList.add('d-flex');
+      div.classList.add('p-2');
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = 'teachers[]';
+      
+      const button = document.createElement('button');
+      button.type = 'button';
+
+      button.onclick = function() {
+        removeTeacher(this);
+      }
+
+      button.innerHTML = '<i class="fas fa-trash-alt"></i> Remover professor';
+
+      div.appendChild(input);
+      div.appendChild(button);
+
+      teachers.appendChild(div);
+    }
+
+    function removeTeacher(element) {
+      element.parentNode.remove();
+    }
+
+    const disciplines = document.querySelectorAll('.discipline');
+    const backgrounds = ["bg-blue", "bg-red", "bg-green", "bg-yellow", "bg-purple", "bg-white", "bg-gray", "bg-black", "bg-brown", "bg-orange", "bg-pink", "bg-cyan", "bg-indigo", "bg-teal", "bg-lime", "bg-amber"];  
+
+    function random(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    if (disciplines) {
+      disciplines.forEach(discipline => {
+        let color = backgrounds[random(0, backgrounds.length - 1)];
+        backgrounds.splice(backgrounds.indexOf(color), 1);
+        discipline.classList.add(color);
+      });
+    }

@@ -1,0 +1,50 @@
+h3 Minhas atividades
+table
+  tr 
+    th #
+    th Título
+    th Descrição
+    th Data de criação
+    th Questões
+    th Ações
+  if discipline.activities.length
+    each activity in discipline.activities
+      - cont = 1;
+      tr
+        th #{cont++}
+        td= activity.title
+        td= activity.description
+        td= activity.createdAt
+        td= activity.questions.length
+        td
+          a.btn.btn-primary(href=`/activities/${activity._id}`) Visualizar
+          a.btn.btn-warning(href=`/activities/${activity._id}/edit`) Editar
+          form(action=`/activities/${activity._id}?_method=DELETE` method='POST' onsubmit='return confirm("Tem certeza que deseja excluir?")')
+            button.btn.btn-danger(type='submit') Excluir
+  else
+    tr
+      td(colspan='6') Nenhuma atividade cadastrada
+
+br 
+br
+
+button(data-btn-modal="new-activity") <i class="fas fa-plus"></i> Criar uma nova atividade
+.modal.modal-md(data-modal="new-activity")
+  form.modal-content(action="/activity/register" method="POST")
+    .modal-header
+      span(data-modal-close="new-activity") <i class="fas fa-times-circle"></i>
+      h3 Criar uma nova atividade
+    .modal-body
+      div.form-group
+        label(for='title') Título
+        input#title.form-control(type='text' name='title' placeholder='Título da atividade')
+      div.form-group
+        label(for='description') Descrição
+        textarea#description.form-control(name='description' rows='3' placeholder='Descrição da atividade')
+      div.form-group
+        label(for='questions') Questões
+        textarea#questions.form-control(name='questions' rows='3' placeholder='Questões da atividade')
+      
+    .modal-footer
+      button.modal-btn-cancel(data-modal-close="new-activity", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+      button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar

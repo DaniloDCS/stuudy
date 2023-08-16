@@ -1,0 +1,40 @@
+div 
+  label(for="search") Encotre um livro
+  input(type="text" name="search" id="search")
+
+button(data-btn-modal="new-book") <i class="fas fa-plus"></i> Criar uma nova atividade
+.modal.modal-md(data-modal="new-book")
+  form.modal-content(action="/book/register" method="POST")
+    .modal-header
+      span(data-modal-close="new-book") <i class="fas fa-times-circle"></i>
+      h3 Criar uma nova atividade
+    .modal-body
+      div.form-control 
+        label(for="title") Título
+        input(type="text" name="title" id="title")
+      div.form-control 
+        label(for="link") Link
+        input(type="text" name="link" id="link")
+    .modal-footer
+      button.modal-btn-cancel(data-modal-close="new-book", type="button") <i class="fas fa-times-circle"></i> Cancelar 
+      button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+
+h3 Lista de livros
+table
+  tr 
+    th #
+    th Título
+    th Link
+    th Ações
+  - cont = 1; 
+  each book, index in discipline.books
+    tr 
+      th #{cont++}
+      td #{book.title}
+      td #{book.link}
+      td 
+        a(href="/disciplines/discipline/" + discipline.id + "/book/" + book.id) Acessar
+        a(href="/disciplines/discipline/" + discipline.id + "/book/" + book.id + "/delete")  | Remover
+
+script. 
+  function findBook() {}

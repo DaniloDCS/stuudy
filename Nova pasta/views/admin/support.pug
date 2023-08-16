@@ -1,0 +1,94 @@
+extends ../layout
+block content
+  if !support
+    h1 Support not found
+  else
+    h1 Suporte: #{support.title}
+    h3 Usuário: 
+      a(href=`/u/${support.user.username}`, target="__blank") #{support.user.name}
+      |  - #{support.user.username}
+    p #{support.content}
+    if support.status == 'attending'
+      p Atendente: 
+        a(href=`/u/${support.attending.username}`, target="__blank") #{support.attending.name}
+        |  - #{support.attending.username}
+      if support.attending && support.attending.id == user.id  
+        button(class="attending", onclick=`attending('${support.id}')`) Conluir atendimento
+    else if support.status == 'pending' && support.attending == null
+      button(class="attending", onclick=`attending('${support.id}')`) Iniciar atendimento
+
+    h3 Mensagens 
+    if support.responses
+      each message in support.responses
+        div(class=`message ${message.author}`)
+          strong #{message.author == 'user' ? support.user.username : support.attending.username}: 
+          |  #{message.response}
+          small #{new Date(message.date).toLocaleString("pt-BR")} - #{message.userId === user.id ? message.read ? 'Lida' : 'Não lida' : ''}
+    else 
+      h4 Não há mensagens
+
+    if support.status == 'attending'
+      div 
+        form(action=`/admin/support/${support.id}/reply`, method="POST", id="send-message")
+          div
+            label(for="content") Nova mensagem
+            textarea(name="reply", placeholder="Conteúdo") #{support.responses.length === 0 ? `Ola, ${support.user.username.split(" ")[0]}! Me chamo ${support.attending.username.split(" ")[0]} e vou dar prosseguimento a tua solicitação.` : ''}
+          div
+            button(type="button", onclick=`sendMessage('${support.id}')`) Enviar
+  
+  script.
+    function attending(id) {
+      fetch(`/admin/attending/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          location.reload()
+        }
+      })
+    }
+
+    function finish(id) {
+      fetch(`/admin/support/${id}/finish`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          attending: user.id
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          location.reload()
+        }
+      })
+    }
+
+    function sendMessage(id) {
+      const reply = document.querySelector('textarea[name="reply"]').value
+      
+      fetch(`/admin/support/${id}/reply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          reply
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          location.reload()
+        }
+      })
+    }
+    
+    

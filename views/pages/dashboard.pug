@@ -1,0 +1,143 @@
+extends ../layout
+block content
+  style. 
+    .row {
+      flex-wrap: wrap;
+    }
+
+    .todos-list {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .todo {
+      border-radius: 5px;
+      transition: all 0.3s ease-in-out;
+      position: relative;
+    }
+
+    .todo-discipline-title {
+      font-size: 1.5rem;
+      
+    }
+
+    .todo-title {
+      font-size: 1.2rem;
+      padding: 6px 0;
+    }
+
+    .todo-status {
+      padding: 6px 0;
+      background-color: #fff;
+      color: #000;
+      border-radius: 5px 0 0 5px;
+    }
+
+    .pill {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: red; 
+      font-size: smaller;
+    }
+
+  // textarea #{JSON.stringify(todos, null, 2)}
+  // textarea #{JSON.stringify(friends, null, 2)}
+  // textarea #{JSON.stringify(supports, null, 2)}
+
+  .row.justify-start.align-start
+    .col-ms-6.col-md-4.col-lg-4.col-xl-4.pl-1.pr-1
+      h2.p-2 <i class="fas fa-bell"></i> Notificações <div class="pill">#{notifies.notifies.length}</div>
+      if !notifies.notifies.length
+        p Nenhuma notificação
+      else
+        each notify in notifies.notifies
+          .p-3.mb-2.r-3(data-id=`${notify.id}` class=`${notify.status ? 'bg-gray' : 'bg-green'}`)
+            if !notify.status 
+              button(class="read", onclick=`markAsRead('${notify.id}')`) Marcar como lida
+            .text-white
+              h3 !{notify.title}
+              p !{notify.content}
+              p !{notify.by}
+              p #{new Date(notify.createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' })}
+  
+    .col-ms-6.col-md-4.col-lg-4.col-xl-4.pl-1.pr-1
+      h2.p-2 <i class="fas fa-users"></i> Amigos <div class="pill">#{friends.length}</div>
+      if !friends.length
+        p Nenhum amigo
+      else
+        each friend in friends
+          .p-3.mb-1
+            .text-white
+              if friend.sender != user.id
+                .d-flex.align-center.justify-start
+                  img(src=`${friend.from.avatar}`, alt=`${friend.from.name}`, width="50px", height="50px").r-50
+                  .pl-1 
+                    h3 !{friend.from.name} - !{friend.from.username}
+                    h4 !{friend.from.email}
+                    h5 Visto por último em !{new Date(friend.from.accesses[friend.from.accesses.length - 1].date).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' })}
+
+              if friend.recipient != user.id
+                .d-flex.align-center.justify-start
+                  img(src=`${friend.to.avatar}`, alt=`${friend.to.name}`, width="50px", height="50px").r-50
+                  .pl-1 
+                    h3 !{friend.to.name} - !{friend.to.username}
+                    h4 !{friend.to.email}
+                    h5 Visto por último em !{new Date(friend.to.accesses[friend.to.accesses.length - 1].date).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' })}              
+
+
+    .col-ms-6.col-md-4.col-lg-4.col-xl-4.pl-1.pr-1
+      h2.p-2 <i class="fas fa-tasks"></i> Tarefas <div class="pill">#{todos.length}</div>
+      .todos-list
+        if !todos.length
+          p Nenhuma tarefa
+        else
+          each todo in todos
+            .todo.p-3.mb-2.r-3
+              .text-white
+                h3.todo-discipline-title !{todo.discipline.icon} | !{todo.discipline.title}
+                h4.todo-title !{todo.todo.title}
+                p # !{todo.todo.content}
+                p #{new Date(todo.todo.finishIn).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' })}
+                p.todo-status !{todo.todo.status === 'concluded' ? 'Concluído' : todo.todo.status === 'pending' ? 'Pendente' : 'Atrasado'}
+    
+    .col-ms-6.col-md-4.col-lg-4.col-xl-4.pl-1.pr-1
+      h2.p-2 <i class="fas fa-calendar-alt"></i> Calendário
+
+    .col-ms-6.col-md-4.col-lg-4.col-xl-4.pl-1.pr-1
+      h2.p-2 <i class="fas fa-bell"></i> Suportes
+      if !supports.length
+        p Nenhum suporte
+      else
+        each support in supports
+          .p-3.mb-2.r-3
+            .text-white
+              h3 !{support.title}
+              p !{support.content}
+              p !{support.by}
+              p #{new Date(support.createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' })}
+
+  script.
+
+    function markAsRead(id) {
+      fetch(`/users/notify/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          status: true
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          const notify = document.querySelector(`[data-id="${id}"]`);
+          notify.classList.remove('bg-green');
+          notify.classList.add('bg-gray');
+        }
+      })
+    }

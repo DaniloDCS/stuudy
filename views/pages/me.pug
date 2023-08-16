@@ -1,0 +1,103 @@
+extends ../layout
+block content
+  style. 
+    #themes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+      list-style: none;
+    }
+
+    #themes .theme {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid #ccc;
+    }
+
+    #themes .theme.active {
+      border: 2px solid lime;
+    }
+
+  h1 Meu perfil
+
+  - const themes = ["theme-blue", "theme-red", "theme-green", "theme-yellow", "theme-purple", "theme-white", "theme-gray", "theme-black", "theme-brown", "theme-orange", "theme-pink", "theme-cyan", "theme-indigo", "theme-teal", "theme-lime", "theme-amber"];
+  - let current = themes.indexOf(user.theme);
+  div
+    h2 Temas
+    #themes
+      each theme in themes
+        .theme(class=`circle-${theme} ${theme === user.theme ? 'active' : ''}`, data-theme=`${theme}`)
+
+
+  div
+    h2 Informações pessoais
+    form(action="/me/update", method="post") 
+      div
+        label(for="name") Nome
+        input(type="text", name="name", required="required", id="name", value=user.name)
+      div
+        label(for="username") Username
+        input(type="text", name="username", required="required", id="username", value=user.username)
+      div
+        label(for="email") Email
+        input(type="email", name="email", required="required", id="email", value=user.email)
+      div
+        label(for="phone") Phone
+        input(type="phone", name="phone", required="required", id="phone", value=user.phone)
+      div 
+        label(for="avatar") Avatar
+        input(type="file", name="avatar", id="avatar", accept="image/*", required="required")
+      div 
+        label(for="biography") Biografia
+        textarea(name="biography", id="biography", required="required") #{user.biography} 
+      div 
+        button(type="submit") Atualizar informações
+  div
+    h2 Alterar senha
+    form(action="/me/update", method="post") 
+      div
+        label(for="password") Senha atual
+        input(type="password", name="password", required="required", id="password")
+      div
+        label(for="new-password") Nova senha
+        input(type="password", name="new-password", required="required", id="new-password")
+      div 
+        button(type="submit") Atualizar senha
+
+
+  script. 
+    const dataThemes = document.querySelectorAll("[data-theme]");
+    const themeCurrent = document.querySelector("#theme-current");
+    
+    if (dataThemes.length){
+      dataThemes.forEach(dataTheme => {
+        dataTheme.addEventListener("click", () => {
+          const theme = dataTheme.dataset.theme;
+          fetch("/users/theme", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              theme
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status) {
+              dataThemes.forEach(dataTheme => {
+                dataTheme.classList.remove("active");
+                themeCurrent.classList.remove(dataTheme.dataset.theme);
+              });
+              dataTheme.classList.add("active");
+              themeCurrent.classList.add(theme);
+            }
+          });
+        });
+      });
+    }

@@ -1,0 +1,124 @@
+extends ../layout
+block content
+  if account
+    div(style="display: flex; justify-content: flex-start; align-items: center;")
+      img(src=account.avatar, alt=account.name, style="width: 100px; height: 100px; border-radius: 50%; margin: 10px;")
+      div 
+        h3 Olá, #{account.name} - #{account.username}
+        p #{account.email} 
+        p= isMyFriend
+      if isMyFriend === "not authenticated"
+        a(href="/") Faça login para adicionar amigos
+      if user     
+        if isMyFriend === "friends"
+          button(type="button", onclick=`undoFriend('${relation}')`, style="margin-left: 10px;") Desfazer amizade
+          a(href="/friends/chat/"+relation) Conversar
+        else if isMyFriend === "friendship request sent"
+          button(type="button", onclick=`cancelFriend('${relation}')`, style="margin-left: 10px;") Cancelar solicitação
+        else if isMyFriend === "friendship request received"
+          button(type="button", onclick=`refuseFriend('${relation}')`, style="margin-left: 10px;") Recusar solicitação
+          button(type="button", onclick=`acceptFriend('${relation}')`, style="margin-left: 10px;") Aceitar solicitação
+        else
+          button(type="button", onclick=`sendFriend('${account.id}')`, style="margin-left: 10px;") Adicionar amigo
+        button(type="button", onclick=`bloqFriend('${relation}')`, style="margin-left: 10px;") Bloquear este usuário
+  else 
+    h1 Usuário não encontrado
+  
+  if isMyFriend != "not authenticated" 
+    script.
+      
+      function cancelFriend(id){
+        fetch(`/friends/solicitation/cancel/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 200) {
+            location.reload()
+          } console.log(data)
+        })
+      }
+
+      function acceptFriend(id){
+        fetch(`/friends/solicitation/accept/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 200) {
+            location.reload()
+          } console.log(data)
+        })
+      }
+
+      function sendFriend(id){
+        fetch(`/friends/send/solicitation/${id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 200) {
+            location.reload()
+          } console.log(data)
+        })
+      }
+
+      function refuseFriend(id){
+        fetch(`/friends/solicitation/refuse/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 200) {
+            location.reload()
+          } console.log(data)
+        })
+      }
+
+      function undoFriend(id){
+        fetch(`/friends/undo/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 200) {
+            location.reload()
+          } console.log(data)
+        })
+      }
+
+      function bloqFriend(id){
+        fetch(`/friends/bloq/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 200) {
+            location.reload()
+          } console.log(data)
+        })
+      }
