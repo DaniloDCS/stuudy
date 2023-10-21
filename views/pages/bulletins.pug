@@ -14,7 +14,7 @@ form.bulletins(action="/bulletin" method="POST", id="bulletins")
         input(type="text", value=bulletin.type, readonly, name=`${bulletin.type}${index}[type]`, required)
         if index > 1 && index < discipline.bulletins.length - 2
           button(type="button", onclick="removeNote(this)") <i class="fas fa-trash-alt"></i> Remover
-  //button(type="submit") <i class="fas fa-save"></i> Salvar
+  button(type="submit") <i class="fas fa-save"></i> Salvar
   button(type="button", onclick="addNote()") <i class="fas fa-plus"></i> Adicionar nota
 
 script.
