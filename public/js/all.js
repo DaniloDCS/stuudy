@@ -82,6 +82,8 @@ if (richTexts.length > 0) {
     listOl: () => document.execCommand('insertOrderedList'),
     textAlign: (value) => document.execCommand('justify' + value),
     fontFamily: (value) => document.execCommand('fontName', false, value),
+    superscript: (value) => document.execCommand('superscript', false, value),
+    supscript: (value) => document.execCommand('supscript', false, value),
     fontSize: (value) => { 
       document.execCommand("fontSize", false, value);
       var fontElements = window.getSelection().anchorNode.parentNode
@@ -141,16 +143,18 @@ if (richTexts.length > 0) {
       document.execCommand('createLink', false, link);
     }
 
-    const selectKeys = ['KeyZ', 'KeyV', 'KeyY', 'KeyC', 'KeyA', 'KeyI', 'Space', 'Enter']
+    const selectKeys = ['KeyZ', 'KeyV', 'KeyY', 'KeyC', 'KeyA', 'KeyI', 'Space', 'Enter', 'Period', 'Comma'];
     if (e.ctrlKey && selectKeys.includes(code)) {
-      if (code === 'KeyZ') document.execCommand('undo');
-      if (code === 'KeyY') document.execCommand('redo');
+      //if (code === 'KeyZ') document.execCommand('undo');
+      //if (code === 'KeyY') document.execCommand('redo');
       if (code === 'KeyV') document.execCommand('paste', null, null);
       if (code === 'KeyC') document.execCommand('copy');
       if (code === 'KeyA') document.execCommand('selectAll');
       if (code === 'Space') document.execCommand('removeFormat');
       if (code === 'Enter') document.execCommand('insertParagraph');
       if (code === 'KeyI') document.execCommand('italic');
+      if (code === 'Period') document.execCommand('subscript');
+      if (code === 'Comma') document.execCommand('superscript');
     }
 
     // tab
@@ -167,12 +171,12 @@ if (richTexts.length > 0) {
         
         if (list === 'ul') {
           // se for uma lista não ordenada, cria um novo elemento de lista com um tab de distância de acordo com o nível
-          document.execCommand('insertHTML', false, '<li style="margin-left: ' + (level === 'ul' ? '10px' : level === 'ol' ? '20px' : '30px') + ';">&#009</li>');
+          document.execCommand('insertHTML', false, '<li style="margin-top: 6px; margin-left: ' + (level === 'ul' ? '10px' : level === 'ol' ? '20px' : '30px') + ';">&#009</li>');
         }
 
         if (list === 'ol') {
           // se for uma lista ordenada, cria um novo elemento de lista com um tab de distância, de acordo com o nível
-          document.execCommand('insertHTML', false, '<li style="margin-left: ' + (level === 'ul' ? '10px' : level === 'ol' ? '20px' : '30px') + ';">&#009</li>');
+          document.execCommand('insertHTML', false, '<li style="margin-top: 6px; margin-left: ' + (level === 'ul' ? '10px' : level === 'ol' ? '20px' : '30px') + ';">&#009</li>');
         }
 
       } else document.execCommand('insertHTML', false, '&#009');
@@ -217,6 +221,8 @@ if (richTexts.length > 0) {
       fontStyle: father.querySelector('[data-rich-font-style]'),
       textAlign: father.querySelector('[data-rich-text-align]'),
       bold: father.querySelector('[data-rich-bold]'),
+      superscript: father.querySelector('[data-rich-superscript]'),
+      subscript: father.querySelector('[data-rich-subscript]'),
       italic: father.querySelector('[data-rich-italic]'),
       underline: father.querySelector('[data-rich-underline]'),
       strike: father.querySelector('[data-rich-strike]'),
@@ -360,6 +366,14 @@ if (richTexts.length > 0) {
         othersAttributes: { innerHTML: '<i class="fas fa-strikethrough"></i>' }
       }, {
         tag: "button",
+        attributes: { type: "button", class: "rich-text-subscript", "data-rich-subscript": richData },
+        othersAttributes: { innerHTML: '<i class="fas fa-subscript"></i>' }
+      }, {
+        tag: "button",
+        attributes: { type: "button", class: "rich-text-superscript", "data-rich-superscript": richData },
+        othersAttributes: { innerHTML: '<i class="fas fa-superscript"></i>' }
+      }, {
+        tag: "button",
         attributes: { type: "button", class: "rich-text-list", "data-rich-list": richData },
         othersAttributes: { innerHTML: '<i class="fas fa-list"></i>' }
       }, {
@@ -401,6 +415,8 @@ if (richTexts.length > 0) {
     item.querySelector('[data-rich-bold]').addEventListener('click', e => commands.bold());
     item.querySelector('[data-rich-italic]').addEventListener('click', e => commands.italic());
     item.querySelector('[data-rich-underline]').addEventListener('click', e => commands.underline());
+    item.querySelector('[data-rich-superscript]').addEventListener('click', e => commands.superscript());
+    item.querySelector('[data-rich-subscript]').addEventListener('click', e => commands.supscript());
     item.querySelector('[data-rich-strike]').addEventListener('click', e => commands.strike());
     item.querySelector('[data-rich-text-align]').addEventListener('change', e => commands.textAlign(e.target.value));
     item.querySelector('[data-rich-list]').addEventListener('click', e => commands.list());
