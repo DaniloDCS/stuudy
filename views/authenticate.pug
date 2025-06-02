@@ -1,5 +1,397 @@
 doctype html
+html(lang="pt-BR")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Stuudy | Área de autenticação 
+    link(rel="stylesheet", href="/fontawesome/css/all.css")
+    style.
+      /* Reset Básico */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Fonte e Cores Futuristas */
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: #ffffff;
+        transition: background 0.5s ease;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        width: 90%;
+        max-width: 1000px;
+        display: flex;
+        flex-wrap: wrap;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Seções de Formulário */
+      .form-section {
+        display: flex;
+        width: 100%;
+        transition: all 0.5s ease;
+      }
+
+      .form-section.hidden {
+        display: none;
+      }
+
+      .image-container {
+        flex: 1;
+        min-width: 300px;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .image-container img {
+        width: 80%;
+        height: auto;
+        border-radius: 15px;
+      }
+
+      .form-container {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+      }
+
+      .form-container h2 {
+        margin-bottom: 10px;
+        font-size: 2em;
+        text-align: center;
+      }
+
+      .form-container p {
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 1em;
+      }
+
+      .form-container label {
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .form-container input {
+        padding: 10px;
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 5px;
+      }
+
+      .form-container button {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background: #00b4db;
+        color: #fff;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .form-container button:hover {
+        background: #0083b0;
+      }
+
+      .form-item {
+        margin: 5px 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .links {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .links a {
+        color: #00b4db;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .links a:hover {
+        color: #ffffff;
+      }
+
+      /* Cores Dinâmicas */
+      body.blue {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+      }
+
+      body.green {
+        background: linear-gradient(135deg, #56ab2f, #a8e063);
+      }
+
+      body.red {
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      }
+
+      /* Responsividade */
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+        }
+
+        .image-container,
+        .form-container {
+          width: 100%;
+        }
+
+        .form-container {
+          padding: 20px;
+        }
+
+        .form-container h2 {
+          font-size: 1.5em;
+        }
+      }
+
+      .message-alert {
+        padding: 8px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        color: #fff;
+        display: none; /* Inicialmente oculto */
+        font-size: 0.9em;
+      }
+
+      .alert-success {
+        background-color: #4caf50;
+      }
+
+      .alert-error {
+        background-color: #f44336;
+      }
+
+      .alert-info {
+        background-color: #2196f3;
+      }
+  body
+    .container
+      //- Login Section
+      #login.form-section
+        .image-container
+          img(src="/public/images/login-image.jpg", alt="Login Image")
+        .form-container
+          h2 Bem-vindo ao Stuudy
+          p Entre na sua conta para continuar.
+
+          //- Alerta para Login
+          p.message-alert#loginAlert
+
+          form(action="/authenticate/signin", method="post", id="loginForm")
+           .form-item
+              label(for="loginIdentifier") <i class="fas fa-user"></i> Email ou usuário
+              input(type="text", name="email", id="loginIdentifier", placeholder="@stuudy", required)
+           .form-item
+              label(for="loginPassword") <i class="fas fa-lock"></i> Senha
+              input(type="password", name="password", id="loginPassword", placeholder="Insira sua senha", required)
+          
+           button(type="submit") Acessar minha conta
+          .links
+            a(href="#register") Cadastrar-se
+            a(href="#forgot") Esqueci minha senha
+
+      //- Register Section
+      #register.form-section.hidden
+        .image-container
+          img(src="/public/images/register-image.jpg", alt="Register Image")
+        .form-container
+          h2 Cadastre-se no Stuudy
+          p Crie sua conta para acessar todos os recursos.
+
+          //- Alerta para Cadastro
+          p.message-alert#registerAlert
+
+          form#registerForm
+            .form-item
+              label(for="registerName") Nome
+              input(type="text", id="registerName", name="registerName", required)
+            .form-item
+              label(for="registerEmail") Email
+              input(type="email", id="registerEmail", name="registerEmail", required)
+            .form-item
+              label(for="registerPassword") Senha
+              input(type="password", id="registerPassword", name="registerPassword", required)
+            .form-item
+              label(for="confirmPassword") Confirme a Senha
+              input(type="password", id="confirmPassword", name="confirmPassword", required)
+            button(type="submit") Finalizar meu cadastro
+          .links
+            a(href="#login") Já tem uma conta? Entre
+            a(href="#forgot") Esqueci minha senha
+
+      //- Forgot Password Section
+      #forgot.form-section.hidden
+        .image-container
+          img(src="/public/images/forgot-image.png", alt="Forgot Password Image")
+        .form-container
+          h2 Esqueci minha Senha
+          p Insira seu email para recuperar sua senha.
+
+          //- Alerta para Esqueci minha Senha
+          p.message-alert#forgotAlert
+
+          form#forgotForm
+            .form-item
+              label(for="forgotEmail") Email
+              input(type="email", id="forgotEmail", name="forgotEmail", required)
+            button(type="submit") Enviar
+          .links
+            a(href="#login") Voltar ao Login
+            a(href="#register") Cadastrar-se
+    script.
+      // Função para alternar a cor de fundo
+      function changeBackgroundColor() {
+        const colors = ["blue", "green", "red"];
+        let currentColor = localStorage.getItem("bgColor") || "blue";
+        let currentIndex = colors.indexOf(currentColor);
+        let nextIndex = (currentIndex + 1) % colors.length;
+        document.body.classList.remove(...colors);
+        document.body.classList.add(colors[nextIndex]);
+        localStorage.setItem("bgColor", colors[nextIndex]);
+      }
+
+      // Alternar cor a cada 10 segundos
+      // setInterval(changeBackgroundColor, 10000);
+
+      // Função para mostrar a seção correta com base no hash
+      function showSection() {
+        const hash = window.location.hash || "#login";
+        const sections = document.querySelectorAll(".form-section");
+        sections.forEach((section) => {
+          if ("#" + section.id === hash) {
+            section.classList.remove("hidden");
+          } else {
+            section.classList.add("hidden");
+          }
+        });
+      }
+
+      // Validação de Senha
+      function validatePassword(password) {
+        const regex =
+          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+        return regex.test(password);
+      }
+
+      // Função para exibir alerta
+      function showAlert(alertElement, message, type) {
+        alertElement.textContent = message;
+        alertElement.classList.remove('alert-success', 'alert-error', 'alert-info');
+        alertElement.classList.add(type);
+        alertElement.style.display = 'block';
+      }
+
+      // Função para esconder alerta
+      function hideAlert(alertElement) {
+        alertElement.textContent = '';
+        alertElement.classList.remove('alert-success', 'alert-error', 'alert-info');
+        alertElement.style.display = 'none';
+      }
+
+      // Eventos de Navegação
+      window.addEventListener("hashchange", showSection);
+      window.addEventListener("load", () => {
+        showSection();
+        changeBackgroundColor(); // Inicializa a cor de fundo
+      });
+
+      // Eventos de Formulário
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const password =
+            document.getElementById("registerPassword").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+          const registerAlert = document.getElementById("registerAlert");
+          hideAlert(registerAlert);
+
+          if (!validatePassword(password)) {
+            showAlert(
+              registerAlert,
+              "Senha inválida! A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, um número e um símbolo.",
+              "alert-error"
+            );
+            return;
+          }
+
+          if (password !== confirmPassword) {
+            showAlert(
+              registerAlert,
+              "As senhas não coincidem!",
+              "alert-error"
+            );
+            return;
+          }
+       })
+         
+
+      document
+        .getElementById("loginForms")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const loginAlert = document.getElementById("loginAlert");
+          hideAlert(loginAlert);
+
+          const identifier = document.getElementById("loginIdentifier").value;
+          const password = document.getElementById("loginPassword").value;
+	  
+          fetch('/authenticate/signin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usrname: identifier, password})
+          })
+          .then(response => response.json())
+          .then(data => {
+            if(data.success){
+              showAlert(forgotAlert, "Instruções para recuperação de senha enviadas!", "alert-success");
+            } else {
+              showAlert(forgotAlert, data.message, "alert-error");
+            }
+          })
+          .catch(error => {
+            showAlert(forgotAlert, "Ocorreu um erro. Tente novamente mais tarde.", "alert-error");
+          });
+
+        })
+
+      document
+        .getElementById("forgotForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const forgotAlert = document.getElementById("forgotAlert");
+          hideAlert(forgotAlert);
+
+          const email = document.getElementById("forgotEmail").value;
+        })
+
+
+
+doctype html
 html(lang="en")
+//--
   head
     meta(charset="UTF-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")

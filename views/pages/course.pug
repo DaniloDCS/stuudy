@@ -33,7 +33,7 @@ block content
       cursor: pointer;
     }
 
-  a(href="/courses") <i class="fas fa-arrow-left"></i> Voltar para cursos
+  a(href="/courses") <i class="fas fa-arrow-left"></i> Voltar para seus cursos
 
   h3 #{course.icon}| #{course.name}
   h4 #{course.description}
@@ -134,13 +134,14 @@ block content
     p Nenhum período encontrado
   else
     .periods
-        each period in course.periods.reverse()
+        each period in course.periods.sort((a, b) => b.name.match(/\d{4}\.\d/)[0].localeCompare(a.name.match(/\d{4}\.\d/)[0]))
           each discipline in period.disciplines
             - listOfDisciplines.push({ name: discipline.name, media: discipline.media, icon: discipline.icon, period: period.name })
           a.period(href="/period/p/" + period.id)
             span.period-icon #{period.icon}
             span #{period.name}
             span #{period.status}
+            span #{period.progress.toFixed(2)} %
 
   button(data-btn-modal="modal-register-period") <i class="fas fa-plus-circle"></i> Registrar um novo período
   .modal(data-modal="modal-register-period")
@@ -171,9 +172,30 @@ block content
         span(data-modal-close="modal-ranking") <i class="fas fa-times-circle"></i>
         h3 Ranking de disciplinas
       .modal-body
-        ul  
+        //- ul  
           each discipline in listOfDisciplines.sort((a, b) => b.media - a.media || a.name.localeCompare(b.name))
             li #{discipline.icon} | #{discipline.period} | #{discipline.name} | #{discipline.media}
+        ul
+          - let currentRange = null;
+          each discipline in listOfDisciplines.sort((a, b) => b.media - a.media || a.name.localeCompare(b.name))
+            - let rangeStart = Math.floor(discipline.media);
+            - let rangeEnd = rangeStart === 10 ? 10 : rangeStart + 0.9;
+            - let rangeLabel = `${rangeStart.toFixed(1)} - ${rangeEnd.toFixed(1)}`;
+            - let bgColor = '';
+            if (rangeStart < 7)
+              - bgColor = 'red';
+            else if (rangeStart < 9)
+              - bgColor = 'blue';
+            else
+              - bgColor = 'green';
+            if rangeLabel !== currentRange
+              - currentRange = rangeLabel;
+              li(style=`font-weight: bold; margin-top: 10px; background: ${bgColor}; color: white; text-align: center; border-radius: 6px; padding: 4px;`)
+                | Média: #{rangeLabel}
+             
+            li #{discipline.icon} | #{discipline.period} | #{discipline.name} | #{discipline.media}
+
+
       .modal-footer
         button.modal-btn-cancel(data-modal-close="modal-ranking") <i class="fas fa-times-circle"></i> Cancelar
 

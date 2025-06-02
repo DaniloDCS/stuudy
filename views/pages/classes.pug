@@ -88,7 +88,7 @@ button(data-btn-modal="new-class") <i class="fas fa-plus"></i> Criar uma nova au
           input(type="date" name="date" id="date")
       .d-flex.justify-center
         .form-item.p-1.w-100    
-          label(for="quantity") <i class="fas fa-sort-numeric-up"></i> Quantidade de aulas
+          label(for="quantity") <i class="fas fa-sort-numeric-up"></i> Horas de aula
           input(type="number" name="quantity" id="quantity", value="2")
         .form-item.p-1.w-100   
           label(for="type") <i class="fas fa-sort-numeric-up"></i> Tipo
@@ -100,14 +100,15 @@ button(data-btn-modal="new-class") <i class="fas fa-plus"></i> Criar uma nova au
             option(value="false") Não
       .form-item   
         label(for="content") <i class="fas fa-file-alt"></i> Conteúdo
-        textarea#content-class-value.d-none(name="content") 
+        textarea#content-class-value.d-none(name="content")
         //.class-content#class-content(contenteditable="true")
-        .rich-text#class-content(data-rich-text="rich-text-0")
+        .rich-text#class-content(data-rich-text="rich-text-0") 
+          
     .modal-footer
       button.modal-btn-cancel(data-modal-close="new-class", type="button") <i class="fas fa-times-circle"></i> Cancelar 
-      button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar
+      button.modal-btn-ok(type="submit") <i class="fas fa-check-circle"></i> Finalizar registro de aula
 
-button(data-btn-modal="new-unity") <i class="fas fa-plus"></i> Criar uma nova unidade
+button(data-btn-modal="new-unity") <i class="fas fa-plus"></i> Criar nova unidade
 .modal.modal-md(data-modal="new-unity")
   .modal-content
     .modal-header
