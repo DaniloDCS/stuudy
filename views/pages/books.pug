@@ -23,15 +23,13 @@ h3 Lista de livros
 table
   tr 
     th #
-    th Título
-    th Link
+    th Livro
     th Ações
   - cont = 1; 
   each book, index in discipline.books
     tr 
       th #{cont++}
-      td #{book.title}
-      td !{book.link}
+      td <a href=#{book.link}, style="color: black !important;" target="__blank">#{book.title}</a>
       td 
         a(href="/disciplines/discipline/" + discipline.id + "/book/" + book.id) Acessar
         a(href="/disciplines/discipline/" + discipline.id + "/book/" + book.id + "/delete")  | Remover

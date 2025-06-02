@@ -71,21 +71,26 @@ block content
     }
 
   .w-100
-    h2 Meus cursos 
+    h2 <i class="fas fa-folder"></i> Lista de cursos
+    button(data-btn-modal="register-course", style="float: right;") <i class="fas fa-folder-plus"></i> Registrar um novo curso
     if !courses.length
-      p Nenhum curso encontrado
+      p Ops... Não foi encontrado nenhum curso! Crie um novo curso!
     else
       .courses
         each course, index in courses
           a.course(href="/course/c/" + course.id)
+            //- textarea #{JSON.stringify(course, null, 2)}
             .course-icon #{course.icon} 
             .course-details
-              .course-title #{course.name}
+              .course-title #{course.name} - #{course.university}
+              small #{course.type}
               .course-progress
-                .course-progress-bar(style=`width: ${course.dados.workloadPercentage}%`) #{course.dados.workloadPercentage}%
-              .course-status #{course.status}
+                .course-progress-bar(style=`width: ${course.dados.workloadPercentage}%`) <i class="fas fa-hourglass"></i>  #{course.dados.workloadPercentage}%
+              div(style="display: flex; gap: 10px;")
+                p.course-status <i class="fas fa-check"></i> #{course.status}
+                p <i class="fas fa-award"></i> #{course.dados.cra}
             
-    button(data-btn-modal="register-course") <i class="fas fa-folder-plus"></i> Registrar um novo curso
+
     .modal.modal-lg(data-modal="register-course")
       form.modal-content(action="/course/register" method="POST")
         .modal-header
