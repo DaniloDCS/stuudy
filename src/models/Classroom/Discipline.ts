@@ -55,7 +55,7 @@ class Discipline implements IDiscipline {
     this.workloadCompleted = workloadCompleted || 0;
     this.progress = progress || 0;
     this.media = media || 0;
-    this.status = status || "studying";
+    this.status = status || "Estudando";
     this.type = type || "obligatory";
     this.unities = unities || [];
     this.createdAt = createdAt || new Date();

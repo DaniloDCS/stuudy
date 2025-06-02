@@ -47,7 +47,7 @@ class Period implements IPeriod {
     this.workload = workload || 0;
     this.workloadCompleted = workloadCompleted || 0;
     this.progress = progress || 0;
-    this.status = status || 'studying';
+    this.status = status || 'Estudando';
     this.disciplines = disciplines || [];
     this.cra = cra || 0;
     this.mc = mc || 0;

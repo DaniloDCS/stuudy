@@ -511,7 +511,7 @@ class Course implements ICourse {
         if (period.getStatus() === "Em curso")
           period.disciplines.forEach((d: Discipline) => {
             let discipline = new Discipline(d);
-            if (discipline.getStatus() === "studying")
+            if (discipline.getStatus() === "Estudando")
               return acc + Number(period.workload);
           });
         return acc;
@@ -536,7 +536,7 @@ class Course implements ICourse {
         const period = new Period(p);
         period.disciplines.forEach((d: Discipline) => {
           d = new Discipline(d);
-          if (d.getStatus() === "studying") acc += Number(d.getCredits());
+          if (d.getStatus() === "Estudando") acc += Number(d.getCredits());
         });
 
         return Number(acc.toFixed(2));
@@ -567,7 +567,7 @@ class Course implements ICourse {
         const period = new Period(p);
         period.disciplines.forEach((d: Discipline) => {
           d = new Discipline(d);
-          if (d.getStatus() === "studying") acc += 1;
+          if (d.getStatus() === "Estudando") acc += 1;
         });
 
         return acc;

@@ -119,6 +119,17 @@ class Routes {
 
       return res.json({ classes: classesResult, books: booksResult });
     });
+
+    this.router.get("/my-history", auth, async (req: Request, res: Response) => {
+      const user = new User(App.get("user"));
+
+      if (!user) return res.redirect("/");
+
+      const courses = await connection.from('Courses').select('*').match({ userId: user.getId() });
+
+      res.json(courses.data);      
+    });
+
   }
 }
 

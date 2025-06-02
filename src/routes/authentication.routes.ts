@@ -31,6 +31,7 @@ class AuthenticateRoutes {
 
       if (email.startsWith('@')) {
         const { data: search, error: errorSearch } = await connection.from('Users').select('*').match({ username: email }).limit(1);
+  
         if (errorSearch) return res.status(500).redirect('/');
 
         if (!search.length) return res.redirect('/');
@@ -38,11 +39,13 @@ class AuthenticateRoutes {
       }
 
       const user = await connection.auth.signIn({ email: username, password });
+
       if (!user) return res.redirect('/');
 
       const { body, error } = await connection.from("Users").select("*").match({ userId: user.user?.id }).limit(1);
+ 
       if (error) return res.status(500).json({ message: 'Usuário não encontrado', error });
-
+      
       const userme = new User(body[0]);
       userme.setAccesses(new Accesses({
         date: new Date(),

@@ -168,6 +168,7 @@ class PeriodRoutes {
 
       return res.redirect("/course/c/" + course.getId());
     });
+
   }
 }
 
